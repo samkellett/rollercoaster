@@ -10,6 +10,38 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="freetypefont.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="gamewindow.h" />
+    <ClInclude Include="highresolutiontimer.h" />
+    <ClInclude Include="matrixstack.h" />
+    <ClInclude Include="objmodel.h" />
+    <ClInclude Include="plane.h" />
+    <ClInclude Include="shaders.h" />
+    <ClInclude Include="skybox.h" />
+    <ClInclude Include="sphere.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="vertexbufferobject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="freetypefont.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="gamewindow.cpp" />
+    <ClCompile Include="highresolutiontimer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="matrixstack.cpp" />
+    <ClCompile Include="objmodel.cpp" />
+    <ClCompile Include="plane.cpp" />
+    <ClCompile Include="shaders.cpp" />
+    <ClCompile Include="skybox.cpp" />
+    <ClCompile Include="sphere.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="vertexbufferobject.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4973297A-B162-4923-A75B-AF5540474D4C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -90,38 +122,6 @@
       <AdditionalDependencies>glew32.lib;opengl32.Lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FreeTypeFont.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameWindow.cpp" />
-    <ClCompile Include="HighResolutionTimer.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MatrixStack.cpp" />
-    <ClCompile Include="ObjModel.cpp" />
-    <ClCompile Include="Plane.cpp" />
-    <ClCompile Include="Shaders.cpp" />
-    <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="Sphere.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="VertexBufferObject.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Common.h" />
-    <ClInclude Include="FreeTypeFont.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameWindow.h" />
-    <ClInclude Include="HighResolutionTimer.h" />
-    <ClInclude Include="MatrixStack.h" />
-    <ClInclude Include="ObjModel.h" />
-    <ClInclude Include="Plane.h" />
-    <ClInclude Include="Shaders.h" />
-    <ClInclude Include="Skybox.h" />
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="VertexBufferObject.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

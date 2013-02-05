@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rollercoaster", "rollercoaster\OpenGLTemplate.vcxproj", "{4973297A-B162-4923-A75B-AF5540474D4C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rollercoaster", "rollercoaster\rollercoaster.vcxproj", "{4973297A-B162-4923-A75B-AF5540474D4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
