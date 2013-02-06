@@ -1,65 +1,62 @@
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
-#include "Common.h"
+#include "common.h"
 
 // Classes used in game
-class CCamera;
-class CSkybox;
-class CShader;
-class CShaderProgram;
-class CPlane;
-class CFreeTypeFont;
-class CHighResolutionTimer;
-class GameWindow;
-class CObjModel;
-class CSphere;
+class Camera;
+class Skybox;
+class Shader;
+class ShaderProgram;
+class Plane;
+class FreeTypeFont;
+class Timer;
+class Window;
+class ObjModel;
+class Sphere;
 
-class Game {
+class Game 
+{
 public:
+  enum {
+    FPS = 30
+  };
+
+  static Game& instance();
+  ~Game();
+
+  WPARAM exec();
+
+  void setHInstance(HINSTANCE hinstance);
+  LRESULT processEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_param);
 
 private:
-	void Init();
-	void Update();
-	void Render();
+  Game::Game();
+  Game::Game(const Game&);
+  void Game::operator=(const Game&);
 
-	CSkybox *pSkybox;
-	CCamera *pCamera;
-	vector <CShaderProgram *> *pShaderPrograms;
-	CPlane *pPlanarTerrain;
-	CFreeTypeFont *pFtFont;
-	CObjModel *pObjBarrel;
-	CObjModel *pObjHorse;
-	CSphere *pSphere;
+  void init();
+  void update();
+  void render();
 
+  void renderFPS();
 
+  Window &window_;
+  HINSTANCE hinstance_;
 
-public:
-	enum {
-		FPS = 30
-	};
+  double dt_;
+  int fps_;
+  Timer *timer_;
+  bool active_;
 
-	static Game& GetInstance();
-
-	~Game();
-
-	WPARAM Exec();
-
-	void SetHinstance(HINSTANCE hinstance);
-	LRESULT ProcessEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_param);
-
-	void DisplayFrameRate();
-
-private:
-	Game::Game();
-	Game::Game(const Game&);
-	void Game::operator=(const Game&);
-	
-
-	GameWindow &rGameWindow;
-	HINSTANCE hHinstance;
-
-	double dDt;
-	int iFramesPerSecond;
-	CHighResolutionTimer *pHighResolutionTimer;
-	bool bAppActive;
+  Skybox *skybox_;
+  Camera *camera_;
+  vector<ShaderProgram *> *shader_programs_;
+  Plane *terrain_;
+  FreeTypeFont *font_;
+  ObjModel *barrel_;
+  ObjModel *horse_;
+  Sphere *sphere_;
 };
+
+#endif

@@ -1,189 +1,191 @@
 #define _USE_MATH_DEFINES
 
 #include "camera.h"
+
 #include "include/gl/glew.h"
 #include <gl/gl.h>
+
 #include <math.h>
-#include "gamewindow.h"
+
+#include "window.h"
 
 // Constructor for camera -- initialise with some default values
-CCamera::CCamera() :
-	m_vPosition(glm::vec3(0.0f, 10.0f, 100.0f)), m_vView(glm::vec3(0.0f, 0.0f, 0.0f)),
-	m_vUpVector(glm::vec3(0.0f, 1.0f, 0.0f)), m_speed(0.025f)
+Camera::Camera() :
+  position_(glm::vec3(0.0f, 10.0f, 100.0f)), view_(glm::vec3(0.0f, 0.0f, 0.0f)),
+  up_vector_(glm::vec3(0.0f, 1.0f, 0.0f)), speed_(0.025f)
 {
 }
  
 // Set the camera at a specific position, looking at the view point, with a given up vector
-void CCamera::Set(glm::vec3 &vPosition, glm::vec3 &vViewpoint, glm::vec3 &vUpVector)
+void Camera::set(glm::vec3 &position, glm::vec3 &viewpoint, glm::vec3 &up_vector)
 {
-	m_vPosition = vPosition;
-	m_vView = vViewpoint;
-	m_vUpVector = vUpVector;
-
+  position_ = position;
+  view_ = viewpoint;
+  up_vector_ = up_vector;
 }
 
 // Respond to mouse movement
-void CCamera::SetViewByMouse()
+void Camera::setViewByMouse()
 {  
-	int iMiddle_x = GameWindow::SCREEN_WIDTH >> 1;
-	int iMiddle_y = GameWindow::SCREEN_HEIGHT >> 1;
+  int middle_x = Window::WIDTH >> 1;
+  int middle_y = Window::HEIGHT >> 1;
 
-	float fAngle_y = 0.0f;
-	float fAngle_z = 0.0f;
-	static float fRotation_x = 0.0f;
+  float angle_y = 0.0f;
+  float angle_z = 0.0f;
+  static float rotation_x = 0.0f;
 
-	POINT mouse;
-	GetCursorPos(&mouse);
+  POINT mouse;
+  GetCursorPos(&mouse);
 
-	if (mouse.x == iMiddle_x && mouse.y == iMiddle_y) {
-		return;
-	}
+  if (mouse.x == middle_x && mouse.y == middle_y) {
+    return;
+  }
 
-	SetCursorPos(iMiddle_x, iMiddle_y);
+  SetCursorPos(middle_x, middle_y);
 
-	fAngle_y = (float) (iMiddle_x - mouse.x) / 1000.0f;
-	fAngle_z = (float) (iMiddle_y - mouse.y) / 1000.0f;
+  angle_y = (float) (middle_x - mouse.x) / 1000.0f;
+  angle_z = (float) (middle_y - mouse.y) / 1000.0f;
 
-	fRotation_x -= fAngle_z;
+  rotation_x -= angle_z;
 
-	float fMaxAngle = 1.56f; // Just a little bit below PI / 2
+  // Just a little bit below PI / 2 -- Sam: should be a #define / const / enum?
+  float max_angle = 1.56f;
 
-	if (fRotation_x > fMaxAngle) {
-		fRotation_x = fMaxAngle;
-	} else if (fRotation_x < -fMaxAngle) {
-		fRotation_x = -fMaxAngle;
-	} else {
-		glm::vec3 cross = glm::cross(m_vView - m_vPosition, m_vUpVector);
-		glm::vec3 axis = glm::normalize(cross);
+  if (rotation_x > max_angle) {
+    rotation_x = max_angle;
+  } else if (rotation_x < -max_angle) {
+    rotation_x = -max_angle;
+  } else {
+    glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
+    glm::vec3 axis = glm::normalize(cross);
 
-		RotateViewPoint(fAngle_z, axis);
-	}
+    rotateViewPoint(angle_z, axis);
+  }
 
-	RotateViewPoint(fAngle_y, glm::vec3(0, 1, 0));
+  rotateViewPoint(angle_y, glm::vec3(0, 1, 0));
 }
 
 // Rotate the camera view point -- this effectively rotates the camera since it is looking at the view point
-void CCamera::RotateViewPoint(float fAngle, glm::vec3 &vPoint)
+void Camera::rotateViewPoint(float angle, glm::vec3 &point)
 {
-	glm::vec3 vView = m_vView - m_vPosition;
-	
-	glm::mat4 R = glm::rotate(glm::mat4(1), fAngle * 180.0f / (float) M_PI, vPoint);
-	glm::vec4 newView = R * glm::vec4(vView, 1);
+  glm::vec3 view = view_ - position_;
+  
+  glm::mat4 rotated = glm::rotate(glm::mat4(1), angle * 180.0f / (float) M_PI, point);
+  glm::vec4 new_view = rotated * glm::vec4(view, 1);
 
-	m_vView = m_vPosition + glm::vec3(newView);
+  view_ = position_ + glm::vec3(new_view);
 }
 
 // Strafe the camera (side to side motion)
-void CCamera::Strafe(double fDirection)
+void Camera::strafe(double direction)
 {
-	float fSpeed = (float) (m_speed * fDirection);
+  float speed = (float) (speed_ * direction);
 
-	m_vPosition.x = m_vPosition.x + m_vStrafeVector.x * fSpeed;
-	m_vPosition.z = m_vPosition.z + m_vStrafeVector.z * fSpeed;
+  position_.x = position_.x + strafe_vector_.x * speed;
+  position_.z = position_.z + strafe_vector_.z * speed;
 
-	m_vView.x = m_vView.x + m_vStrafeVector.x * fSpeed;
-	m_vView.z = m_vView.z + m_vStrafeVector.z * fSpeed;
+  view_.x = view_.x + strafe_vector_.x * speed;
+  view_.z = view_.z + strafe_vector_.z * speed;
 }
 
 // Advance the camera (forward / backward motion)
-void CCamera::Advance(double fDirection)
+void Camera::advance(double direction)
 {
-	float fSpeed = (float) (m_speed * fDirection);
+  float speed = (float) (speed_ * direction);
 
-	glm::vec3 vView = glm::normalize(m_vView - m_vPosition);
-	m_vPosition = m_vPosition + vView * fSpeed;
-	m_vView = m_vView + vView * fSpeed;
-
+  glm::vec3 view = glm::normalize(view_ - position_);
+  position_ = position_ + view * speed;
+  view_ = view_ + view * speed;
 }
 
 // Update the camera to respond to mouse motion for rotations and keyboard for translation
-void CCamera::Update(double fDt)
+void Camera::update(double dt)
 {
-	glm::vec3 vCross = glm::cross(m_vView - m_vPosition, m_vUpVector);
-	m_vStrafeVector = glm::normalize(vCross);
+  glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
+  strafe_vector_ = glm::normalize(cross);
 
-	SetViewByMouse();
-	TranslateByKeyboard(fDt);
+  setViewByMouse();
+  translateByKeyboard(dt);
 }
 
 // Update the camera to respond to key presses for translation
-void CCamera::TranslateByKeyboard(double fDt)
+void Camera::translateByKeyboard(double dt)
 {
-	if(GetKeyState(VK_UP) & 0x80) {		
-		Advance(1.0*fDt);	
-	}
+  if(GetKeyState(VK_UP) & 0x80) {    
+    advance(1.0 * dt);  
+  }
 
-	if(GetKeyState(VK_DOWN) & 0x80) {	
-		Advance(-1.0*fDt);		
-	}
+  if(GetKeyState(VK_DOWN) & 0x80) {  
+    advance(-1.0 * dt);    
+  }
 
-	if(GetKeyState(VK_LEFT) & 0x80) {	
-		Strafe(-1.0*fDt);
-	}
+  if(GetKeyState(VK_LEFT) & 0x80) {  
+    strafe(-1.0 * dt);
+  }
 
-	if(GetKeyState(VK_RIGHT) & 0x80 ) {			
-		Strafe(1.0*fDt);
-	}	
+  if(GetKeyState(VK_RIGHT) & 0x80 ) {      
+    strafe(1.0 * dt);
+  }  
 }
 
 // Return the camera position
-glm::vec3 CCamera::GetPosition() const
+glm::vec3 Camera::position() const
 {
-	return m_vPosition;
+  return position_;
 }
 
 // Return the camera view point
-glm::vec3 CCamera::GetView() const
+glm::vec3 Camera::view() const
 {
-	return m_vView;
+  return view_;
 }
 
 // Return the camera up vector
-glm::vec3 CCamera::GetUpVector() const
+glm::vec3 Camera::upVector() const
 {
-	return m_vUpVector;
+  return up_vector_;
 }
 
 // Return the camera strafe vector
-glm::vec3 CCamera::GetStrafeVector() const
+glm::vec3 Camera::strafeVector() const
 {
-	return m_vStrafeVector;
+  return strafe_vector_;
 }
 
 // Return the camera perspective projection matrix
-glm::mat4* CCamera::GetPerspectiveProjectionMatrix()
+glm::mat4 *Camera::perspectiveMatrix()
 {
-	return &m_mPerspectiveProjection;
+  return &perspective_;
 }
 
 // Return the camera orthographic projection matrix
-glm::mat4* CCamera::GetOrthographicProjectionMatrix()
+glm::mat4 *Camera::orthographicMatrix()
 {
-	return &m_mOrthographicProjection;
+  return &orthographic_;
 }
 
 // Set the camera perspective projection matrix to produce a view frustum with a specific field of view, aspect ratio, 
 // and near / far clipping planes
-void CCamera::SetPerspectiveProjectionMatrix(float fFOV, float fAspectRatio, float fNear, float fFar)
+void Camera::setPerspectiveMatrix(float fov, float aspect_ratio, float near, float far)
 {
-	m_mPerspectiveProjection = glm::perspective(fFOV, fAspectRatio, fNear, fFar);
+  perspective_ = glm::perspective(fov, aspect_ratio, near, far);
 }
 
 // The the camera orthographic projection matrix to match the width and height passed in
-void CCamera::SetOrthographicProjectionMatrix(int iWidth, int iHeight)
+void Camera::setOrthographicMatrix(int width, int height)
 {
-	m_mOrthographicProjection = glm::ortho(0.0f, float(iWidth), 0.0f, float(iHeight));
+  orthographic_ = glm::ortho(0.0f, (float) width, 0.0f, (float) height);
 }
 
 // Get the camera view matrix
-glm::mat4 CCamera::GetViewMatrix()
+glm::mat4 Camera::viewMatrix()
 {
-	return glm::lookAt(m_vPosition, m_vView, m_vUpVector);
+  return glm::lookAt(position_, view_, up_vector_);
 }
 
 // The normal matrix is used to transform normals to eye coordinates -- part of lighting calculations
-glm::mat3 CCamera::ComputeNormalMatrix(const glm::mat4 &modelViewMatrix)
+glm::mat3 Camera::normalMatrix(const glm::mat4 &modelview)
 {
-	return glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+  return glm::transpose(glm::inverse(glm::mat3(modelview)));
 }
 

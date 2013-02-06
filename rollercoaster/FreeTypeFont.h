@@ -1,46 +1,56 @@
-#pragma once
+#ifndef FREETYPEFONT_H
+#define FREETYPEFONT_H
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "Texture.h"
-#include "Shaders.h"
-#include "VertexBufferObject.h"
-
+#include "texture.h"
+#include "shaders.h"
+#include "vbo.h"
 
 // This class is a wrapper for FreeType fonts and their usage with OpenGL
-class CFreeTypeFont
+class FreeTypeFont
 {
 public:
-	CFreeTypeFont();
+  FreeTypeFont();
 
-	bool LoadFont(string sFile, int iPXSize);
-	bool LoadSystemFont(string sName, int iPXSize);
+  bool loadFont(string file, int size);
+  bool loadSystemFont(string name, int size);
 
-	int GetTextWidth(string sText, int iPXSize);
+  int textWidth(string text, int size);
 
-	void Print(string sText, int x, int y, int iPXSize = -1);
-	void PrintFormatted(int x, int y, int iPXSize, char* sText, ...);
+  void print(string sText, int x, int y, int size = -1);
+  void printf(int x, int y, int size, char* text, ...);
 
-	void ReleaseFont();
+  void release();
 
-	void SetShaderProgram(CShaderProgram* a_shShaderProgram);
+  void setShaderProgram(ShaderProgram* shader_program);
 
 private:
-	void CreateChar(int iIndex);
+  void createChar(int index);
 
-	CTexture m_tCharTextures[256];
-	int m_iAdvX[256], m_iAdvY[256];
-	int m_iBearingX[256], m_iBearingY[256];
-	int m_iCharWidth[256], m_iCharHeight[256];
-	int m_iLoadedPixelSize, m_iNewLine;
+  Texture textures_[256];
 
-	bool m_bLoaded;
+  int adv_x_[256];
+  int adv_y_[256];
 
-	UINT m_uiVAO;
-	CVertexBufferObject m_vboData;
+  int bearing_x_[256];
+  int bearing_y_[256];
 
-	FT_Library m_ftLib;
-	FT_Face m_ftFace;
-	CShaderProgram* m_shShaderProgram;
+  int char_width_[256];
+  int char_height_[256];
+
+  int loaded_size_;
+  int new_line_;
+
+  bool loaded_;
+
+  UINT vao_;
+  VBO vbo_;
+
+  FT_Library freetype_;
+  FT_Face freetype_face_;
+  ShaderProgram* fonts_;
 };
+
+#endif

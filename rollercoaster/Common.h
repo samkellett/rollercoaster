@@ -1,3 +1,6 @@
+#ifndef COMMON_H
+#define COMMON_H
+
 #include <ctime>
 #include <windows.h>
 
@@ -10,7 +13,9 @@
 #include <map>
 #include <set>
 
-#include "./include/glm/gtc/type_ptr.hpp"
-#include "./include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
 
 using namespace std;
+
+#endif

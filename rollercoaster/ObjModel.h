@@ -8,21 +8,21 @@
 class CObjModel
 {
 public:
-	CObjModel();
-	bool Load(string sFileName, string sMtlFileName);
-	void Render();
-	void Release();
+  CObjModel();
+  bool Load(string sFileName, string sMtlFileName);
+  void Render();
+  void Release();
 
-	int GetPolygonCount();
+  int GetPolygonCount();
 
 private:
-	bool m_bLoaded;
-	int m_iAttrBitField;
-	int m_iNumFaces;
-	CVertexBufferObject m_vboModelData;
-	UINT m_uiVAO;
-	CTexture m_tAmbientTexture;
+  bool m_bLoaded;
+  int m_iAttrBitField;
+  int m_iNumFaces;
+  CVertexBufferObject m_vboModelData;
+  UINT m_uiVAO;
+  CTexture m_tAmbientTexture;
 
-	bool LoadMaterial(string sFullMtlFileName);
+  bool LoadMaterial(string sFullMtlFileName);
 
 };

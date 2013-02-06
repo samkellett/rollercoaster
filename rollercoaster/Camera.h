@@ -1,55 +1,84 @@
-#pragma once
+#ifndef CAMERA_H
+#define CAMERA_H
 
-#include "./include/glm/gtc/type_ptr.hpp"
-#include "./include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
 
-class CCamera {
+class Camera 
+{
 public:
-	CCamera();										// Constructor - sets default values for camera position, viewvector, upvector, and speed
+  // Constructor - sets default values for camera position, viewvector, upvector, and speed
+  Camera();
 
-	glm::vec3 GetPosition() const;					// Gets the position of the camera centre of projection
-	glm::vec3 GetView() const;						// Gets the position of the camera view point
-	glm::vec3 GetUpVector() const;					// Gets the camera up vector
-	glm::vec3 GetStrafeVector() const;				// Gets the camera strafe vector
-	glm::mat4* GetPerspectiveProjectionMatrix();	// Gets the camera perspective projection matrix
-	glm::mat4* GetOrthographicProjectionMatrix();	// Gets the camera orthographic projection matrix
-	glm::mat4 GetViewMatrix();						// Gets the camera view matrix - note this is not stored in the class but returned using glm::lookAt() in GetViewMatrix()
+  // Gets the position of the camera centre of projection
+  glm::vec3 position() const;
 
-	// Set the camera position, viewpoint, and up vector
-	void Set(glm::vec3 &vPosition, glm::vec3 &vViewpoint, glm::vec3 &vUpVector);
-	
-	// Rotate the camera viewpoint -- this effectively rotates the camera
-	void RotateViewPoint(float fAngle, glm::vec3 &vPoint);
+  // Gets the position of the camera view point
+  glm::vec3 view() const;
 
-	// Respond to mouse movement to rotate the camera
-	void SetViewByMouse();
+  // Gets the camera up vector
+  glm::vec3 upVector() const;
 
-	// Respond to keyboard presses on arrow keys to translate the camera
-	void TranslateByKeyboard(double fDt);
+  // Gets the camera strafe vector
+  glm::vec3 strafeVector() const;
 
-	// Strafe the camera (move it side to side)
-	void Strafe(double fDirection);
+  // Gets the camera perspective projection matrix
+  glm::mat4 *perspectiveMatrix();
 
-	// Advance the camera (move it forward or backward)
-	void Advance(double fDirection);
+  // Gets the camera orthographic projection matrix
+  glm::mat4 *orthographicMatrix();
 
-	// Update the camera
-	void Update(double fDt);
+  // Gets the camera view matrix - note this is not stored in the class but returned using glm::lookAt() in viewMatrix()
+  glm::mat4 viewMatrix();
 
-	// Set the projection matrices
-	void SetPerspectiveProjectionMatrix(float fFOV, float fAspectRatio, float fNear, float fFar);
-	void SetOrthographicProjectionMatrix(int iWidth, int iHeight);
+  // Set the camera position, viewpoint, and up vector
+  void set(glm::vec3 &position, glm::vec3 &viewpoint, glm::vec3 &up_vector);
+  
+  // Rotate the camera viewpoint -- this effectively rotates the camera
+  void rotateViewPoint(float theta, glm::vec3 &point);
 
-	glm::mat3 ComputeNormalMatrix(const glm::mat4 &modelViewMatrix);
+  // Respond to mouse movement to rotate the camera
+  void setViewByMouse();
+
+  // Respond to keyboard presses on arrow keys to translate the camera
+  void translateByKeyboard(double dt);
+
+  // Strafe the camera (move it side to side)
+  void strafe(double direction);
+
+  // Advance the camera (move it forward or backward)
+  void advance(double direction);
+
+  // Update the camera
+  void update(double dt);
+
+  // Set the projection matrices
+  void setPerspectiveMatrix(float fov, float aspect_ratio, float near, float far);
+  void setOrthographicMatrix(int width, int height);
+
+  glm::mat3 normalMatrix(const glm::mat4 &modelview);
 
 private:
-	glm::vec3 m_vPosition;			// The position of the camera's centre of projection
-	glm::vec3 m_vView;				// The camera's viewpoint (point where the camera is looking)
-	glm::vec3 m_vUpVector;			// The camera's up vector
-	glm::vec3 m_vStrafeVector;		// The camera's strafe vector
+  // The position of the camera's centre of projection
+  glm::vec3 position_;
 
-	float m_speed;					// How fast the camera moves
+  // The camera's viewpoint (point where the camera is looking)
+  glm::vec3 view_;
 
-	glm::mat4 m_mPerspectiveProjection;		// Perspective projection matrix
-	glm::mat4 m_mOrthographicProjection;	// Orthographic projection matrix
+  // The camera's up vector
+  glm::vec3 up_vector_;
+
+  // The camera's strafe vector
+  glm::vec3 strafe_vector_;
+
+  // How fast the camera moves
+  float speed_;
+
+  // Perspective projection matrix
+  glm::mat4 perspective_;
+
+  // Orthographic projection matrix
+  glm::mat4 orthographic_;
 };
+
+#endif

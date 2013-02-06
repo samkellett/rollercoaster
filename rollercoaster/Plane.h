@@ -8,15 +8,15 @@
 class CPlane
 {
 public:
-	void Create(string sDirectory, string sFilename, float fWidth, float fHeight, float fTextureRepeat);
-	void Render();
-	void Release();
+  void Create(string sDirectory, string sFilename, float fWidth, float fHeight, float fTextureRepeat);
+  void Render();
+  void Release();
 private:
-	UINT m_uiVAO;
-	CVertexBufferObject m_vboRenderData;
-	CTexture m_tTexture;
-	string m_sDirectory;
-	string m_sFilename;
-	float m_fwidth;
-	float m_fheight;
+  UINT m_uiVAO;
+  CVertexBufferObject m_vboRenderData;
+  CTexture m_tTexture;
+  string m_sDirectory;
+  string m_sFilename;
+  float m_fwidth;
+  float m_fheight;
 };

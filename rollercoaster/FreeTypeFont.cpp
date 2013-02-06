@@ -1,194 +1,226 @@
-#include "Common.h"
-
-#include "FreeTypeFont.h"
+#include "freetypefont.h"
 
 #include "include/glm/gtc/matrix_transform.hpp"
 
-#pragma comment(lib, "lib/freetype2410.lib")
-  
+#include "common.h"
 
 using namespace std;
 
-CFreeTypeFont::CFreeTypeFont()
+FreeTypeFont::FreeTypeFont() :
+  loaded_(false)
 {
-	m_bLoaded = false;
 }
 
-/*-----------------------------------------------
-
-Name:	createChar
-
-Params:	iIndex - character index in Unicode.
-
-Result:	Creates one single character (its
-		texture).
-
-/*---------------------------------------------*/
-
-inline int next_p2(int n){int res = 1; while(res < n)res <<= 1; return res;}
-
-void CFreeTypeFont::CreateChar(int iIndex)
+inline int next_p2(int n)
 {
-	FT_Load_Glyph(m_ftFace, FT_Get_Char_Index(m_ftFace, iIndex), FT_LOAD_DEFAULT);
+  int res = 1; 
+  while (res < n) {
+    res <<= 1; 
+  }
+  return res;
+}
 
-	FT_Render_Glyph(m_ftFace->glyph, FT_RENDER_MODE_NORMAL);
-	FT_Bitmap* pBitmap = &m_ftFace->glyph->bitmap;
+// Creates one single character (its texture).
+void FreeTypeFont::createChar(int index)
+{
+  FT_Load_Glyph(freetype_face_, FT_Get_Char_Index(freetype_face_, index), FT_LOAD_DEFAULT);
 
-	int iW = pBitmap->width, iH = pBitmap->rows;
-	int iTW = next_p2(iW), iTH = next_p2(iH);
+  FT_Render_Glyph(freetype_face_->glyph, FT_RENDER_MODE_NORMAL);
+  FT_Bitmap* bitmap = &freetype_face_->glyph->bitmap;
 
-	GLubyte* bData = new GLubyte[iTW*iTH];
-	// Copy glyph data and add dark pixels elsewhere
-	for (int ch = 0; ch < iTH; ch++) 
-		for (int cw = 0; cw < iTW; cw++)
-			bData[ch*iTW+cw] = (ch >= iH || cw >= iW) ? 0 : pBitmap->buffer[(iH-ch-1)*iW+cw];
+  int width = bitmap->width;
+  int height = bitmap->rows;
+
+  // Sam: I don't know what iTW and iTH stand for...
+  int twidth = next_p2(width);
+  int theight = next_p2(height);
+
+  GLubyte* data = new GLubyte[twidth*theight];
+
+  // Copy glyph data and add dark pixels elsewhere
+  for (int ch = 0; ch < theight; ++ch) {
+    for (int cw = 0; cw < twidth; ++cw) {
+      data[ch * twidth + cw] = (ch >= height || cw >= width) ? 0 : bitmap->buffer[(height - ch - 1) * width + cw];
+    }
+  }
  
-	// And create a texture from it
+  // And create a texture from it
+  textures_[index].createFromData(data, twidth, theight, 8, GL_DEPTH_COMPONENT, false);
+  textures_[index].setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR);
 
-	m_tCharTextures[iIndex].CreateFromData(bData, iTW, iTH, 8, GL_DEPTH_COMPONENT, false);
-	m_tCharTextures[iIndex].SetFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR);
+  textures_[index].setSamplerParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  textures_[index].setSamplerParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	m_tCharTextures[iIndex].SetSamplerParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	m_tCharTextures[iIndex].SetSamplerParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  // Calculate glyph data
+  adv_x_[index] = freetype_face_->glyph->advance.x >> 6;
+  bearing_x_[index] = freetype_face_->glyph->metrics.horiBearingX >> 6;
+  char_width_[index] = freetype_face_->glyph->metrics.width >> 6;
 
-	// Calculate glyph data
-	m_iAdvX[iIndex] = m_ftFace->glyph->advance.x>>6;
-	m_iBearingX[iIndex] = m_ftFace->glyph->metrics.horiBearingX>>6;
-	m_iCharWidth[iIndex] = m_ftFace->glyph->metrics.width>>6;
+  adv_y_[index] = (freetype_face_->glyph->metrics.height - freetype_face_->glyph->metrics.horiBearingY) >> 6;
+  bearing_y_[index] = freetype_face_->glyph->metrics.horiBearingY >> 6;
+  char_height_[index] = freetype_face_->glyph->metrics.height >> 6;
 
-	m_iAdvY[iIndex] = (m_ftFace->glyph->metrics.height - m_ftFace->glyph->metrics.horiBearingY)>>6;
-	m_iBearingY[iIndex] = m_ftFace->glyph->metrics.horiBearingY>>6;
-	m_iCharHeight[iIndex] = m_ftFace->glyph->metrics.height>>6;
+  new_line_ = max(new_line_, (int) (freetype_face_->glyph->metrics.height >> 6));
 
-	m_iNewLine = max(m_iNewLine, int(m_ftFace->glyph->metrics.height>>6));
+  // Rendering data, texture coordinates are always the same, so now we waste a little memory
+  glm::vec2 quad[] =
+  {
+    glm::vec2(0.0f, (float) (-adv_y_[index] + theight)),
+    glm::vec2(0.0f, (float) -adv_y_[index]),
+    glm::vec2((float) twidth, (float) (-adv_y_[index] + theight)),
+    glm::vec2((float) twidth, (float) -adv_y_[index])
+  };
 
-	// Rendering data, texture coordinates are always the same, so now we waste a little memory
-	glm::vec2 vQuad[] =
-	{
-		glm::vec2(0.0f, float(-m_iAdvY[iIndex]+iTH)),
-		glm::vec2(0.0f, float(-m_iAdvY[iIndex])),
-		glm::vec2(float(iTW), float(-m_iAdvY[iIndex]+iTH)),
-		glm::vec2(float(iTW), float(-m_iAdvY[iIndex]))
-	};
-	glm::vec2 vTexQuad[] = {glm::vec2(0.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f)};
+  glm::vec2 texture_quad[] = {
+    glm::vec2(0.0f, 1.0f),
+    glm::vec2(0.0f, 0.0f),
+    glm::vec2(1.0f, 1.0f),
+    glm::vec2(1.0f, 0.0f)
+  };
 
-	// Add this char to VBO
-	for (int i = 0; i < 4; i++) {
-		m_vboData.AddData(&vQuad[i], sizeof(glm::vec2));
-		m_vboData.AddData(&vTexQuad[i], sizeof(glm::vec2));
-	}
-	delete[] bData;
+  // Add this char to VBO
+  for (int i = 0; i < 4; ++i) {
+    vbo_.addData(&quad[i], sizeof(glm::vec2));
+    vbo_.addData(&texture_quad[i], sizeof(glm::vec2));
+  }
+
+  delete[] data;
 }
 
 
 // Loads an entire font with the given path sFile and pixel size iPXSize
-bool CFreeTypeFont::LoadFont(string sFile, int iPXSize)
+bool FreeTypeFont::loadFont(string file, int size)
 {
-	BOOL bError = FT_Init_FreeType(&m_ftLib);
-	
-	bError = FT_New_Face(m_ftLib, sFile.c_str(), 0, &m_ftFace);
-	if(bError) {
-		char message[1024];
-		sprintf_s(message, "Cannot load font\n%s\n", sFile.c_str());
-		MessageBox(NULL, message, "Error", MB_ICONERROR);
-		return false;
-	}
-	FT_Set_Pixel_Sizes(m_ftFace, iPXSize, iPXSize);
-	m_iLoadedPixelSize = iPXSize;
+  BOOL error = FT_Init_FreeType(&freetype_);
+  
+  error = FT_New_Face(freetype_, file.c_str(), 0, &freetype_face_);
+  if(error) {
+    char message[1024];
+    sprintf_s(message, "Cannot load font\n%s\n", file.c_str());
 
-	glGenVertexArrays(1, &m_uiVAO);
-	glBindVertexArray(m_uiVAO);
-	m_vboData.Create();
-	m_vboData.Bind();
+    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    return false;
+  }
 
-	for (int i = 0; i < 128; i++)
-		CreateChar(i);
-	m_bLoaded = true;
+  FT_Set_Pixel_Sizes(freetype_face_, size, size);
+  loaded_size_ = size;
 
-	FT_Done_Face(m_ftFace);
-	FT_Done_FreeType(m_ftLib);
-	
-	m_vboData.UploadDataToGPU(GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2)*2, 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2)*2, (void*)(sizeof(glm::vec2)));
-	return true;
+  glGenVertexArrays(1, &vao_);
+  glBindVertexArray(vao_);
+
+  vbo_.create();
+  vbo_.bind();
+
+  for (int i = 0; i < 128; ++i) {
+    createChar(i);
+  }
+
+  loaded_ = true;
+
+  FT_Done_Face(freetype_face_);
+  FT_Done_FreeType(freetype_);
+  
+  vbo_.uploadData(GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, 0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, (void *) (sizeof(glm::vec2)));
+
+  return true;
 }
 
 // Loads a system font with given name (sName) and pixel size (iPXSize)
-bool CFreeTypeFont::LoadSystemFont(string sName, int iPXSize)
+bool FreeTypeFont::loadSystemFont(string name, int size)
 {
-	char buf[512]; GetWindowsDirectory(buf, 512);
-	string sPath = buf;
-	sPath += "\\Fonts\\";
-	sPath += sName;
+  char windows_directory[512]; 
+  GetWindowsDirectory(windows_directory, 512);
+  
+  string path = windows_directory;
+  path += "\\Fonts\\";
+  path += name;
 
-	return LoadFont(sPath, iPXSize);
+  return loadFont(path, size);
 }
 
 
-// Prints text at the specified location (x, y) with the given pixel size (iPXSize)
-void CFreeTypeFont::Print(string sText, int x, int y, int iPXSize)
+// Prints text at the specified location (x, y) with the given pixel size (size)
+void FreeTypeFont::print(string text, int x, int y, int size)
 {
-	if(!m_bLoaded)
-		return;
+  if(!loaded_) {
+    return;
+  }
 
-	glBindVertexArray(m_uiVAO);
-	m_shShaderProgram->SetUniform("gSampler", 0);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	int iCurX = x, iCurY = y;
-	if(iPXSize == -1)
-		iPXSize = m_iLoadedPixelSize;
-	float fScale = float(iPXSize)/float(m_iLoadedPixelSize);
-	for (int i = 0; i < (int) sText.size(); i++) {
-		if(sText[i] == '\n')
-		{
-			iCurX = x;
-			iCurY -= m_iNewLine*iPXSize/m_iLoadedPixelSize;
-			continue;
-		}
-		int iIndex = int(sText[i]);
-		iCurX += m_iBearingX[iIndex]*iPXSize/m_iLoadedPixelSize;
-		if(sText[i] != ' ')
-		{
-			m_tCharTextures[iIndex].Bind();
-			glm::mat4 mModelView = glm::translate(glm::mat4(1.0f), glm::vec3(float(iCurX), float(iCurY), 0.0f));
-			mModelView = glm::scale(mModelView, glm::vec3(fScale));
-			m_shShaderProgram->SetUniform("matrices.modelViewMatrix", mModelView);
-			// Draw character
-			glDrawArrays(GL_TRIANGLE_STRIP, iIndex*4, 4);
-		}
+  glBindVertexArray(vao_);
+  fonts_->SetUniform("gSampler", 0);
 
-		iCurX += (m_iAdvX[iIndex]-m_iBearingX[iIndex])*iPXSize/m_iLoadedPixelSize;
-	}
-	glDisable(GL_BLEND);
+  glEnable(GL_BLEND);
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  int cursor_x = x;
+  int cursor_y = y;
+
+  if(size == -1) {
+    size = m_iLoadedPixelSize;
+  }
+
+  float fScale = (float) size / (float) loaded_size_;
+  for (int i = 0; i < (int) text.size(); ++i) {
+    if(text[i] == '\n') {
+      cursor_x = x;
+      cursor_y -= new_line_ * size / loaded_size_;
+    } else {
+      int index = (int) text[i];
+      cursor_x += bearing_x_[index] * size / loaded_size_;
+
+      if(text[i] != ' ') {
+        textures_[index].bind();
+
+        glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3((float) cursor_x, (float) cursor_y, 0.0f));
+        modelview = glm::scale(modelview, glm::vec3(fScale));
+        fonts_->SetUniform("matrices.modelViewMatrix", modelview);
+        
+        // Draw character
+        glDrawArrays(GL_TRIANGLE_STRIP, index*4, 4);
+      }
+
+      cursor_x += (adv_x_[index] - bearing_x_[index]) * size / loaded_size_;
+    }
+  }
+
+  glDisable(GL_BLEND);
 }
 
 
 // Print formatted text at the location (x, y) with specified pixel size (iPXSize)
-void CFreeTypeFont::PrintFormatted(int x, int y, int iPXSize, char* sText, ...)
+void FreeTypeFont::printf(int x, int y, int size, char* text, ...)
 {
-	char buf[512];
-	va_list ap;
-	va_start(ap, sText);
-	vsprintf_s(buf, sText, ap);
-	va_end(ap);
-	Print(buf, x, y, iPXSize);
+  char buf[512];
+
+  // Sam: this is cool.
+  va_list ap;
+  va_start(ap, text);
+  vsprintf_s(buf, text, ap);
+  va_end(ap);
+
+  print(buf, x, y, size);
 }
 
 // Deletes all font textures
-void CFreeTypeFont::ReleaseFont()
+void FreeTypeFont::release()
 {
-	for (int i = 0; i < 128; i++) 
-		m_tCharTextures[i].Release();
-	m_vboData.Release();
-	glDeleteVertexArrays(1, &m_uiVAO);
+  // Sam: any reason this is 128 whereas the arrays are initiated as 256?
+  for (int i = 0; i < 128; i++) {
+    textures_[i].release();
+  }
+
+  vbo_.release();
+  glDeleteVertexArrays(1, &vao_);
 }
 
 // Sets shader programme that font uses
-void CFreeTypeFont::SetShaderProgram(CShaderProgram* a_shShaderProgram)
+void FreeTypeFont::setShaderProgram(ShaderProgram* shader_program)
 {
-	m_shShaderProgram = a_shShaderProgram;
+  shader_program_ = shader_program;
 }
