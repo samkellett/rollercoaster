@@ -1,28 +1,29 @@
-#include "HighResolutionTimer.h"
+#include "timer.h"
 
-CHighResolutionTimer::CHighResolutionTimer() :
-m_bStarted(false)
+Timer::Timer() :
+  started_(false)
 {
 }
 
-CHighResolutionTimer::~CHighResolutionTimer()
+Timer::~Timer()
 {
 }
 
-void CHighResolutionTimer::Start()
+void Timer::start()
 {
-  m_bStarted = true;
-  QueryPerformanceCounter(&m_t1);
+  started_ = true;
+  QueryPerformanceCounter(&t1_);
 }
 
-double CHighResolutionTimer::Elapsed()
+double Timer::elapsed()
 {
-  if (!m_bStarted)
+  if (!started_) {
     return 0.0;
+  }
 
   LARGE_INTEGER frequency;
   QueryPerformanceFrequency(&frequency);
 
-  QueryPerformanceCounter(&m_t2);
-  return (double) (m_t2.QuadPart - m_t1.QuadPart) * 1000.0f / frequency.QuadPart;
+  QueryPerformanceCounter(&t2_);
+  return (double) (t2_.QuadPart - t1_.QuadPart) * 1000.0f / frequency.QuadPart;
 }

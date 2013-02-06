@@ -1,53 +1,55 @@
-#pragma once
+#ifndef WINDOW_H
+#define WINDOW_H
 
 #include <windows.h>
-#include "Common.h"
+
+#include "common.h"
 
 LRESULT CALLBACK WinProc(HWND hWnd,UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-class GameWindow {
+class Window {
 public:
-  static GameWindow& GetInstance();
+  static Window& instance();
 
   enum {
-    SCREEN_WIDTH = 800,
-    SCREEN_HEIGHT = 600,
+    WIDTH = 800,
+    HEIGHT = 600,
   };
 
-  HDC Init(HINSTANCE hinstance);
-  void Deinit();
+  HDC init(HINSTANCE hinstance);
+  void deinit();
 
-  void SetDimensions(RECT dimensions) {m_dimensions = dimensions;}
-  RECT GetDimensions() {return m_dimensions;}
+  void setDimensions(RECT dimensions);
+  RECT dimensions();
 
-  bool Fullscreen() const { return m_bFullscreen; }
+  bool fullscreen() const;
 
-  HDC Hdc() const { return m_hdc; }
-  HINSTANCE Hinstance() const { return m_hinstance; }
-  HGLRC Hrc() const { return m_hrc; }
-  HWND  Hwnd() const { return m_hwnd; }
+  HDC hdc() const;
+  HINSTANCE hinstance() const;
+  HGLRC hrc() const;
+  HWND hwnd() const;
 
 private:
-  GameWindow();
-  GameWindow(const GameWindow&);
-  void operator=(const GameWindow&);
+  Window();
+  Window(const Window&);
+  void operator=(const Window&);
 
-  void CreateGameWindow(string title);
-  void InitOpenGL();
-  bool InitGLEW();
-  void RegisterSimpleOpenGLClass(HINSTANCE hInstance);
+  void create(string title);
+  void initOpenGL();
+  bool initGLEW();
+  void registerOpenGLClass(HINSTANCE hInstance);
 
-  bool  m_bFullscreen;
+  bool fullscreen_;
 
-  HDC   m_hdc;
-  HINSTANCE m_hinstance;
-  HGLRC m_hrc;
-  HWND  m_hwnd;
+  HDC hdc_;
+  HINSTANCE hinstance_;
+  HGLRC hrc_;
+  HWND hwnd_;
 
-  LPSTR m_class;
-  RECT  m_dimensions;
+  LPSTR class_;
+  RECT  dimensions_;
 
-  string m_sAppName;
-
+  string name_;
 };
 
+#endif

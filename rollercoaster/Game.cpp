@@ -252,7 +252,7 @@ void Game::render()
   renderFPS();
 
   // Swap buffers to show the rendered image
-  SwapBuffers(window_.HDC());    
+  SwapBuffers(window_.hdc());    
 }
 
 
@@ -311,7 +311,7 @@ WPARAM Game::exec()
   timer_ = new Timer;
   window_.init(hinstance_);
 
-  if(!window_.HDC()) {
+  if(!window_.hdc()) {
     return 1;
   }
 

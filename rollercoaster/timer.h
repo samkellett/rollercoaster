@@ -1,17 +1,20 @@
-#pragma once
+#ifndef TIMER_H
+#define TIMER_H
 
 #include <windows.h>
 
-class CHighResolutionTimer 
+class Timer 
 {
 public:
-  CHighResolutionTimer();
-  ~CHighResolutionTimer();
+  Timer();
+  ~Timer();
 
-  void Start();
-  double Elapsed();
+  void start();
+  double elapsed();
 
 private:
-  LARGE_INTEGER m_t1, m_t2;
-  bool m_bStarted;
+  LARGE_INTEGER t1_, t2_;
+  bool started_;
 };
+
+#endif

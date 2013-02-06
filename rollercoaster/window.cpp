@@ -1,4 +1,4 @@
-#include "gamewindow.h"
+#include "window.h"
 
 #include "include/gl/glew.h"
 #include "include/gl/wglew.h"
@@ -6,44 +6,48 @@
 
 #define SIMPLE_OPENGL_CLASS_NAME "simple_openGL_class_name"
 
-GameWindow& GameWindow::GetInstance() 
+Window& Window::instance() 
 {
-  static GameWindow instance;
+  static Window instance;
 
   return instance;
 }
 
-GameWindow::GameWindow() : m_bFullscreen(false) 
+Window::Window() : 
+  fullscreen_(false) 
 {
 }
 
-// A message handler for the dummy window
-LRESULT CALLBACK MsgHandlerSimpleOpenGLClass(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+// A message handler for the dummy window -- Sam: hmm........
+LRESULT CALLBACK fakeWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
   PAINTSTRUCT ps;
-  switch(uiMsg)
-  {
+  switch (msg) {
     case WM_PAINT:                  
-      BeginPaint(hWnd, &ps);              
-      EndPaint(hWnd, &ps);          
-      break;
+      BeginPaint(hwnd, &ps);              
+      EndPaint(hwnd, &ps);          
+    break;
 
     default:
-      return DefWindowProc(hWnd, uiMsg, wParam, lParam); // Default window procedure
+      return DefWindowProc(hwnd, msg, wparam, lparam); // Default window procedure
+    break;
   }
+
   return 0;
 }
 
 // A function to register the dummy window
-void GameWindow::RegisterSimpleOpenGLClass(HINSTANCE hInstance)
+void Window::registerOpenGLClass(HINSTANCE hInstance)
 {
-  static bool bClassRegistered = false;
-  if(bClassRegistered) return;
-  WNDCLASSEX wc;
+  static bool class_registered = false;
+  if (class_registered) {
+    return;
+  }
 
+  WNDCLASSEX wc;
   wc.cbSize = sizeof(WNDCLASSEX);
   wc.style =  CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_DBLCLKS;
-  wc.lpfnWndProc = (WNDPROC) MsgHandlerSimpleOpenGLClass;
+  wc.lpfnWndProc = (WNDPROC) fakeWinProc;
   wc.cbClsExtra = 0; wc.cbWndExtra = 0;
   wc.hInstance = hInstance;
   wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
@@ -54,172 +58,138 @@ void GameWindow::RegisterSimpleOpenGLClass(HINSTANCE hInstance)
   wc.lpszClassName = SIMPLE_OPENGL_CLASS_NAME;
 
   RegisterClassEx(&wc);
-
-  bClassRegistered = true;
+  class_registered = true;
 }
 
 // Create a dummy window, intialise GLEW, and then delete the dummy window
-bool GameWindow::InitGLEW()
+bool Window::initGLEW()
 {
-  static bool bGlewInitialized = false;
-  if(bGlewInitialized)return true;
+  static bool glew_initialised = false;
+  if (glew_initialised) {
+    return true;
+  }
 
-  RegisterSimpleOpenGLClass(m_hinstance);
+  registerOpenGLClass(hinstance_);
 
-  HWND hWndFake = CreateWindow(SIMPLE_OPENGL_CLASS_NAME, "FAKE", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE | WS_CLIPCHILDREN,
+  HWND fake_hwnd = CreateWindow(
+    SIMPLE_OPENGL_CLASS_NAME, "FAKE", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE | WS_CLIPCHILDREN,
     0, 0, CW_USEDEFAULT, CW_USEDEFAULT, NULL,
-    NULL, m_hinstance, NULL);
+    NULL, hinstance_, NULL
+  );
 
-  m_hdc = GetDC(hWndFake);
+  hdc_ = GetDC(fake_hwnd);
 
   // First, choose false pixel format
-  
   PIXELFORMATDESCRIPTOR pfd;
   memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-  pfd.nSize    = sizeof(PIXELFORMATDESCRIPTOR);
-  pfd.nVersion   = 1;
-  pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+
+  pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+  pfd.nVersion = 1;
+  pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
   pfd.iPixelType = PFD_TYPE_RGBA;
   pfd.cColorBits = 32;
   pfd.cDepthBits = 32;
   pfd.iLayerType = PFD_MAIN_PLANE;
  
-  int iPixelFormat = ChoosePixelFormat(m_hdc, &pfd);
-  if (iPixelFormat == 0)return false;
-
-  if(!SetPixelFormat(m_hdc, iPixelFormat, &pfd))return false;
-
-  // Create the false, old style context (OpenGL 2.1 and before)
-
-  HGLRC hRCFake = wglCreateContext(m_hdc);
-  wglMakeCurrent(m_hdc, hRCFake);
-
-  bool bResult = true;
-
-  if(!bGlewInitialized)
-  {
-    if(glewInit() != GLEW_OK)
-    {
-      MessageBox(m_hwnd, "Couldn't initialize GLEW!", "Fatal Error", MB_ICONERROR);
-      bResult = false;
-    }
-    bGlewInitialized = true;
+  int format = ChoosePixelFormat(hdc_, &pfd);
+  if (format == 0) {
+    return false;
   }
 
-  wglMakeCurrent(NULL, NULL);
-  wglDeleteContext(hRCFake);
-  DestroyWindow(hWndFake);
+  if (!SetPixelFormat(hdc_, format, &pfd)) {
+    return false;
+  }
 
-  return bResult;
+  // Create the false, old style context (OpenGL 2.1 and before)
+  HGLRC fake_hrc = wglCreateContext(hdc_);
+  wglMakeCurrent(hdc_, fake_hrc);
+
+  bool result = true;
+
+  if (glewInit() != GLEW_OK) {
+    MessageBox(hwnd_, "Couldn't initialize GLEW!", "Fatal Error", MB_ICONERROR);
+    result = false;
+  }
+  glew_initialised = true;
+
+  wglMakeCurrent(NULL, NULL);
+  wglDeleteContext(fake_hrc);
+  DestroyWindow(fake_hwnd);
+
+  return result;
+
+  // Sam: I DON'T UNDERSTAND THE POINT!
 }
 
 // Initialise GLEW and create the real game window
-HDC GameWindow::Init(HINSTANCE hinstance) 
+HDC Window::init(HINSTANCE hinstance) 
 {
-  m_hinstance = hinstance;
-  if(!InitGLEW())
+  hinstance_ = hinstance;
+  if (!initGLEW()) {
     return false;
+  }
 
-  m_sAppName = "OpenGL";
-
-  CreateGameWindow("OpenGL Template");
+  name_ = "OpenGL";
+  create("OpenGL Template");
 
   // If we never got a valid window handle, quit the program
-  if(m_hwnd == NULL) {
-    return NULL;
-  } else {
-    return m_hdc;
-  }
+  return hwnd_ == NULL ? NULL : hdc_;
 }
 
 // Create the game window
-void GameWindow::CreateGameWindow(string sTitle) 
+void Window::create(string title) 
 {
   WNDCLASSEX wcex;
   memset(&wcex, 0, sizeof(WNDCLASSEX));
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.style = CS_OWNDC;
-
   wcex.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-
-  wcex.hIcon = LoadIcon(m_hinstance, IDI_WINLOGO);
-  wcex.hIconSm = LoadIcon(m_hinstance, IDI_WINLOGO);
-  wcex.hCursor = LoadCursor(m_hinstance, IDC_ARROW);
-  wcex.hInstance = m_hinstance;
-
+  wcex.hIcon = LoadIcon(hinstance_, IDI_WINLOGO);
+  wcex.hIconSm = LoadIcon(hinstance_, IDI_WINLOGO);
+  wcex.hCursor = LoadCursor(hinstance_, IDC_ARROW);
+  wcex.hInstance = hinstance_;
   wcex.lpfnWndProc = WinProc;
-  wcex.lpszClassName = m_sAppName.c_str();
-
+  wcex.lpszClassName = name_.c_str();
   wcex.lpszMenuName = NULL;
-
   RegisterClassEx(&wcex);
 
-
-   if(MessageBox(NULL, "Click Yes to go to windowed mode", "Fullscreen", MB_ICONQUESTION | MB_YESNO) == IDYES)
-  {
-    m_hwnd = CreateWindowEx(0, m_sAppName.c_str(), sTitle.c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-                0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, NULL, m_hinstance, NULL);
+  if (MessageBox(NULL, "Click Yes to go to windowed mode", "Fullscreen", MB_ICONQUESTION | MB_YESNO) == IDYES) {
+    hwnd_ = CreateWindowEx(0, name_.c_str(), title.c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 0, 0, WIDTH, HEIGHT, NULL, NULL, hinstance_, NULL);
   } else {
-    DEVMODE dmSettings = {0};
-    EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dmSettings); // Get current display settings
+    DEVMODE settings = {0};
 
-    m_hwnd = CreateWindowEx(0, m_sAppName.c_str(), sTitle.c_str(), WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, // This is the commonly used style for fullscreen
-              0, 0, dmSettings.dmPelsWidth, dmSettings.dmPelsHeight, NULL, NULL, m_hinstance, NULL);
-    
-  } 
-   
+    // Get current display settings
+    EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &settings);
+
+    // WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN are commonly used style for fullscreen -- Sam: why?
+    hwnd_ = CreateWindowEx(0, name_.c_str(), title.c_str(), WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, settings.dmPelsWidth, settings.dmPelsHeight, NULL, NULL, hinstance_, NULL);
+  }
 
   // Initialise OpenGL here
-  InitOpenGL();
+  initOpenGL();
   
-  ShowWindow(m_hwnd, SW_SHOW);
-  GetClientRect(m_hwnd, &m_dimensions);
+  ShowWindow(hwnd_, SW_SHOW);
+  GetClientRect(hwnd_, &dimensions_);
 
-  UpdateWindow(m_hwnd);
+  UpdateWindow(hwnd_);
 
-  ShowCursor(FALSE);
-  SetFocus(m_hwnd);
-  
+  // ShowCursor(FALSE);
+  SetFocus(hwnd_);
 }
 
 // Initialise OpenGL, including the pixel format descriptor and the OpenGL version
-void GameWindow::InitOpenGL()
+void Window::initOpenGL()
 {
+  hdc_ = GetDC(hwnd_);
 
-  m_hdc = GetDC(m_hwnd);
-
-  bool bError = false;
+  bool error = false;
   PIXELFORMATDESCRIPTOR pfd;
 
-  int iMajorVersion = 3;
-  int iMinorVersion = 3;
+  int major_version = 3;
+  int minor_version = 3;
 
-  if(iMajorVersion <= 2)
-  {
-    memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-    pfd.nSize    = sizeof(PIXELFORMATDESCRIPTOR);
-    pfd.nVersion   = 1;
-    pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 32;
-    pfd.cDepthBits = 32;
-    pfd.iLayerType = PFD_MAIN_PLANE;
- 
-    int iPixelFormat = ChoosePixelFormat(m_hdc, &pfd);
-    if (iPixelFormat == 0)return;
-
-    if(!SetPixelFormat(m_hdc, iPixelFormat, &pfd))return;
-
-    // Create the old style context (OpenGL 2.1 and before)
-    m_hrc = wglCreateContext(m_hdc);
-    if(m_hrc) 
-      wglMakeCurrent(m_hdc, m_hrc);
-    else bError = true;
-  }
-  else if(WGLEW_ARB_create_context && WGLEW_ARB_pixel_format)
-  {
-    const int iPixelFormatAttribList[] =
-    {
+  if (WGLEW_ARB_create_context && WGLEW_ARB_pixel_format) {
+    const int format_attributes[] = {
       WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
       WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
       WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
@@ -230,59 +200,101 @@ void GameWindow::InitOpenGL()
       WGL_STENCIL_BITS_ARB, 8,
       0 // End of attributes list
     };
-    int iContextAttribs[] =
-    {
-      WGL_CONTEXT_MAJOR_VERSION_ARB, iMajorVersion,
-      WGL_CONTEXT_MINOR_VERSION_ARB, iMinorVersion,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+
+    int context_attributes[] = {
+      WGL_CONTEXT_MAJOR_VERSION_ARB, major_version,
+      WGL_CONTEXT_MINOR_VERSION_ARB, minor_version,
+      WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
       0 // End of attributes list
     };
 
-    int iPixelFormat, iNumFormats;
-    wglChoosePixelFormatARB(m_hdc, iPixelFormatAttribList, NULL, 1, &iPixelFormat, (UINT*)&iNumFormats);
+    int pixel_format;
+    int num_format;
+    wglChoosePixelFormatARB(hdc_, format_attributes, NULL, 1, &pixel_format, (UINT *) &num_format);
 
     // PFD seems to be only redundant parameter now
-    if(!SetPixelFormat(m_hdc, iPixelFormat, &pfd))return;
+    if (!SetPixelFormat(hdc_, pixel_format, &pfd)) {
+      return;
+    }
 
-    m_hrc = wglCreateContextAttribsARB(m_hdc, 0, iContextAttribs);
+    hrc_ = wglCreateContextAttribsARB(hdc_, 0, context_attributes);
     // If everything went OK
-    if(m_hrc) wglMakeCurrent(m_hdc, m_hrc);
-    else bError = true;
-
+    if (hrc_) {
+      wglMakeCurrent(hdc_, hrc_);
+    } else {
+      error = true;
+    }
+  } else {
+    error = true;
   }
-  else bError = true;
   
-  if(bError)
+  if(error)
   {
     // Generate error messages
-    char sErrorMessage[255], sErrorTitle[255];
-    sprintf_s(sErrorMessage, "OpenGL %d.%d is not supported! Please download latest GPU drivers!", iMajorVersion, iMinorVersion);
-    sprintf_s(sErrorTitle, "OpenGL %d.%d Not Supported", iMajorVersion, iMinorVersion);
-    MessageBox(m_hwnd, sErrorMessage, sErrorTitle, MB_ICONINFORMATION);
+    char message[255];
+    char title[255];
+
+    sprintf_s(message, "OpenGL %d.%d is not supported! Please download latest GPU drivers!", major_version, minor_version);
+    sprintf_s(title, "OpenGL %d.%d Not Supported", major_version, minor_version);
+
+    MessageBox(hwnd_, message, title, MB_ICONINFORMATION);
     return;
   }
-
 
   return;
 }
 
 // Deinitialise the window and rendering context
-void GameWindow::Deinit()
+void Window::deinit()
 {
-  if (m_hrc) {
+  if (hrc_) {
     wglMakeCurrent(NULL, NULL);
-    wglDeleteContext(m_hrc);
+    wglDeleteContext(hrc_);
   }
 
-  if (m_hdc) {
-    ReleaseDC(m_hwnd, m_hdc);
+  if (hdc_) {
+    ReleaseDC(hwnd_, hdc_);
   }
 
-  if (m_bFullscreen) {
+  if (fullscreen_) {
     ChangeDisplaySettings(NULL, 0);
     ShowCursor(TRUE);
   }
 
-  UnregisterClass(m_class, m_hinstance);
+  UnregisterClass(class_, hinstance_);
   PostQuitMessage(0);
+}
+
+void Window::setDimensions(RECT dimensions) 
+{
+  dimensions_ = dimensions;
+}
+
+RECT Window::dimensions()
+{
+  return dimensions_;
+}
+
+bool Window::fullscreen() const {
+  return fullscreen_;
+}
+
+HDC Window::hdc() const
+{
+  return hdc_;
+}
+
+HINSTANCE Window::hinstance() const
+{
+  return hinstance_;
+}
+
+HGLRC Window::hrc() const
+{
+  return hrc_;
+}
+
+HWND Window::hwnd() const
+{
+  return hwnd_;
 }
