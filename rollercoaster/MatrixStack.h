@@ -64,13 +64,13 @@ namespace glutil
     ///@{
 
     ///Preserves the current matrix on the stack.
-    void Push()
+    void push()
     {
       m_stack.push(m_currMatrix);
     }
 
     ///Restores the most recently preserved matrix.
-    void Pop()
+    void pop()
     {
       m_currMatrix = m_stack.top();
       m_stack.pop();
@@ -81,10 +81,10 @@ namespace glutil
     
     This function does not affect the depth of the matrix stack.
     **/
-    void Reset() { m_currMatrix = m_stack.top(); }
+    void reset() { m_currMatrix = m_stack.top(); }
 
     ///Retrieve the current matrix.
-    const glm::mat4 &Top() const
+    const glm::mat4 &top() const
     {
       return m_currMatrix;
     }
@@ -101,17 +101,17 @@ namespace glutil
     ///@{
 
     ///Applies a rotation matrix about the given axis, with the given angle in degrees.
-    void Rotate(const glm::vec3 axis, float angDegCCW);
+    void rotate(const glm::vec3 axis, float angDegCCW);
 
     ///Applies a rotation matrix about the given axis, with the given angle in radians.
-    void RotateRadians(const glm::vec3 axis, float angRadCCW);
+    void rotateRadians(const glm::vec3 axis, float angRadCCW);
 
     ///Applies a rotation matrix about the +X axis, with the given angle in degrees.
-    void RotateX(float angDegCCW);
+    void rotateX(float angDegCCW);
     ///Applies a rotation matrix about the +Y axis, with the given angle in degrees.
-    void RotateY(float angDegCCW);
+    void rotateY(float angDegCCW);
     ///Applies a rotation matrix about the +Z axis, with the given angle in degrees.
-    void RotateZ(float angDegCCW);
+    void rotateZ(float angDegCCW);
     ///@}
 
     /**
@@ -122,11 +122,11 @@ namespace glutil
     ///@{
 
     ///Applies a scale matrix, with the given glm::vec3 as the axis scales.
-    void Scale(const glm::vec3 &scaleVec);
+    void scale(const glm::vec3 &scaleVec);
     ///Applies a scale matrix, with the given values as the axis scales.
-    void Scale(float scaleX, float scaleY, float scaleZ) {Scale(glm::vec3(scaleX, scaleY, scaleZ));}
+    void scale(float scaleX, float scaleY, float scaleZ) {scale(glm::vec3(scaleX, scaleY, scaleZ));}
     ///Applies a uniform scale matrix.
-    void Scale(float uniformScale) {Scale(glm::vec3(uniformScale));}
+    void scale(float uniformScale) {scale(glm::vec3(uniformScale));}
     ///@}
 
     /**
@@ -137,9 +137,9 @@ namespace glutil
     ///@{
 
     ///Applies a translation matrix, with the given glm::vec3 as the offset.
-    void Translate(const glm::vec3 &offsetVec);
+    void translate(const glm::vec3 &offsetVec);
     ///Applies a translation matrix, with the given X, Y and Z values as the offset.
-    void Translate(float transX, float transY, float transZ) {Translate(glm::vec3(transX, transY, transZ));}
+    void translate(float transX, float transY, float transZ) {translate(glm::vec3(transX, transY, transZ));}
     ///@}
 
     /**
@@ -159,7 +159,7 @@ namespace glutil
     if the up direction is along the same direction as the direction the camera faces (the direction between
     \a cameraPos and \a lookatPos).
     **/
-    void LookAt(const glm::vec3 &cameraPos, const glm::vec3 &lookatPos, const glm::vec3 &upDir);
+    void lookAt(const glm::vec3 &cameraPos, const glm::vec3 &lookatPos, const glm::vec3 &upDir);
     ///@}
 
     /**
@@ -186,7 +186,7 @@ namespace glutil
     \param zFar The farthest camera-space distance from the camera that can be seen.
     The projection will be clipped against this value. It must be larger than \a zNear.
     **/
-    void Perspective(float degFOV, float aspectRatio, float zNear, float zFar);
+    void perspective(float degFOV, float aspectRatio, float zNear, float zFar);
 
     /**
     \brief Applies a standard, OpenGL-style orthographic projection matrix.
@@ -198,7 +198,7 @@ namespace glutil
     \param zNear The front camera-space position in the Z axis that will be captured within the projection.
     \param zFar The rear camera-space position in the Z axis that will be captured within the projection.
     **/
-    void Orthographic(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
+    void orthographic(float left, float right, float bottom, float top, float zNear = -1.0f, float zFar = 1.0f);
 
     /**
     \brief Applies an ortho matrix for pixel-accurate reproduction.
@@ -216,7 +216,7 @@ namespace glutil
     \param depthRange The near and far depth range. The x coord is zNear, and the y coord is zFar.
     \param isTopLeft True if this should be top-left orientation, false if it should be bottom-left.
     **/
-    void PixelPerfectOrtho(glm::ivec2 size, glm::vec2 depthRange, bool isTopLeft = true);
+    void pixelPerfectOrtho(glm::ivec2 size, glm::vec2 depthRange, bool isTopLeft = true);
     ///@}
 
     /**
@@ -226,8 +226,8 @@ namespace glutil
     becomes the new current matrix.
     **/
     ///@{
-    void ApplyMatrix(const glm::mat4 &theMatrix);
-    MatrixStack &operator*=(const glm::mat4 &theMatrix) {ApplyMatrix(theMatrix); return *this;}
+    void applyMatrix(const glm::mat4 &theMatrix);
+    MatrixStack &operator*=(const glm::mat4 &theMatrix) {applyMatrix(theMatrix); return *this;}
     ///@}
 
     /**
@@ -239,9 +239,9 @@ namespace glutil
     ///@{
 
     ///The given matrix becomes the current matrix.
-    void SetMatrix(const glm::mat4 &theMatrix);
+    void setMatrix(const glm::mat4 &theMatrix);
     ///Sets the current matrix to the identity matrix.
-    void SetIdentity();
+    void setIdentity();
     ///@}
 
   private:
@@ -268,13 +268,13 @@ namespace glutil
     PushStack(MatrixStack &stack)
       : m_stack(stack)
     {
-      m_stack.Push();
+      m_stack.push();
     }
 
     ///Pops the MatrixStack that the constructor was given.
     ~PushStack()
     {
-      m_stack.Pop();
+      m_stack.pop();
     }
 
     /**
@@ -284,7 +284,7 @@ namespace glutil
     **/
     void ResetStack()
     {
-      m_stack.Reset();
+      m_stack.reset();
     }
 
   private:

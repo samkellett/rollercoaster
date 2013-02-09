@@ -1,149 +1,165 @@
-#include "Common.h"
-
 #include "texture.h"
+
+#include "common.h"
 
 #include "include\freeimage\FreeImage.h"
 #pragma comment(lib, "lib/FreeImage.lib")
 
-CTexture::CTexture()
+Texture::Texture() :
+  mipmaps_(false)
 {
-  m_bMipMapsGenerated = false;
 }
 
 // Create a texture from the data stored in bData.  
-void CTexture::CreateFromData(BYTE* bData, int iWidth, int iHeight, int iBPP, GLenum format, bool bGenerateMipMaps)
+void Texture::createFromData(BYTE *data, int width, int height, int bpp, GLenum format, bool mipmaps)
 {
-  // Generate an OpenGL texture ID for this texture
-  glGenTextures(1, &m_uiTexture);
-  glBindTexture(GL_TEXTURE_2D, m_uiTexture);
-  if(format == GL_RGBA || format == GL_BGRA)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iWidth, iHeight, 0, format, GL_UNSIGNED_BYTE, bData);
-  // We must handle this because of internal format parameter
-  else if(format == GL_RGB || format == GL_BGR)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iWidth, iHeight, 0, format, GL_UNSIGNED_BYTE, bData);
-  else
-    glTexImage2D(GL_TEXTURE_2D, 0, format, iWidth, iHeight, 0, format, GL_UNSIGNED_BYTE, bData);
-  if(bGenerateMipMaps)glGenerateMipmap(GL_TEXTURE_2D);
-  glGenSamplers(1, &m_uiSampler);
+  path_ = "";
+  mipmaps_ = mipmaps;
+  width_ = width;
+  height_ = height;
+  bpp_ = bpp;
 
-  m_sPath = "";
-  m_bMipMapsGenerated = bGenerateMipMaps;
-  m_iWidth = iWidth;
-  m_iHeight = iHeight;
-  m_iBPP = iBPP;
+  // Generate an OpenGL texture ID for this texture
+  glGenTextures(1, &texture_);
+  glBindTexture(GL_TEXTURE_2D, texture_);
+
+  if(format == GL_RGBA || format == GL_BGRA || format == GL_RGB || format == GL_BGR) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+  } else {
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+  }
+
+  if(mipmaps) {
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+  glGenSamplers(1, &sampler_);
 }
 
 // Loads a 2D texture given the filename (sPath).  bGenerateMipMaps will generate a mipmapped texture if true
-bool CTexture::Load(string sPath, bool bGenerateMipMaps)
+bool Texture::load(string path, bool mipmaps)
 {
   FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
   FIBITMAP* dib(0);
 
-  fif = FreeImage_GetFileType(sPath.c_str(), 0); // Check the file signature and deduce its format
+  fif = FreeImage_GetFileType(path.c_str(), 0); // Check the file signature and deduce its format
 
-  if(fif == FIF_UNKNOWN) // If still unknown, try to guess the file format from the file extension
-    fif = FreeImage_GetFIFFromFilename(sPath.c_str());
+  // If still unknown, try to guess the file format from the file extension
+  if(fif == FIF_UNKNOWN) { 
+    fif = FreeImage_GetFIFFromFilename(path.c_str());
+  }
   
-  if(fif == FIF_UNKNOWN) // If still unknown, return failure
-    return false;
-
-  if(FreeImage_FIFSupportsReading(fif)) // Check if the plugin has reading capabilities and load the file
-    dib = FreeImage_Load(fif, sPath.c_str());
-
-  if(!dib) {
-    char message[1024];
-    sprintf_s(message, "Cannot load image\n%s\n", sPath.c_str());
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+  // If still unknown, return failure
+  if(fif == FIF_UNKNOWN) {
     return false;
   }
 
-  BYTE* bDataPointer = FreeImage_GetBits(dib); // Retrieve the image data
+  // Check if the plugin has reading capabilities and load the file
+  if(FreeImage_FIFSupportsReading(fif)) {
+    dib = FreeImage_Load(fif, path.c_str());
+  }
+
+  if(!dib) {
+    char message[1024];
+    sprintf_s(message, "Cannot load image\n%s\n", path.c_str());
+    MessageBox(NULL, message, "Error", MB_ICONERROR);
+
+    return false;
+  }
+
+  BYTE* data = FreeImage_GetBits(dib); // Retrieve the image data
 
   // If somehow one of these failed (they shouldn't), return failure
-  if(bDataPointer == NULL || FreeImage_GetWidth(dib) == 0 || FreeImage_GetHeight(dib) == 0) 
+  if(data == NULL || FreeImage_GetWidth(dib) == 0 || FreeImage_GetHeight(dib) == 0) {
     return false;
-  
+  }
 
   GLenum format;
   int bada = FreeImage_GetBPP(dib);
-  if(FreeImage_GetBPP(dib) == 32)format = GL_RGBA;
-  if(FreeImage_GetBPP(dib) == 24)format = GL_BGR;
-  if(FreeImage_GetBPP(dib) == 8)format = GL_LUMINANCE;
-  CreateFromData(bDataPointer, FreeImage_GetWidth(dib), FreeImage_GetHeight(dib), FreeImage_GetBPP(dib), format, bGenerateMipMaps);
   
+  if(FreeImage_GetBPP(dib) == 32) {
+    format = GL_RGBA;
+  } else if(FreeImage_GetBPP(dib) == 24) {
+    format = GL_BGR;
+  } else if(FreeImage_GetBPP(dib) == 8) {
+    format = GL_LUMINANCE;
+  }
+
+  createFromData(data, FreeImage_GetWidth(dib), FreeImage_GetHeight(dib), FreeImage_GetBPP(dib), format, mipmaps);
   FreeImage_Unload(dib);
 
-  m_sPath = sPath;
+  path_ = path;
 
-  return true; // Success
+  return true;
 }
 
-void CTexture::SetSamplerParameter(GLenum parameter, GLenum value)
+void Texture::setSamplerParameter(GLenum parameter, GLenum value)
 {
-  glSamplerParameteri(m_uiSampler, parameter, value);
+  glSamplerParameteri(sampler_, parameter, value);
 }
 
 // Uses a sampler object to set texture filtering parameters for the magnification and minificaiton filters
-void CTexture::SetFiltering(int tfMagnification, int tfMinification)
+void Texture::setFiltering(int magnification, int minification)
 {
+  minification_ = minification;
+  magnification_ = magnification;
+
   // Set magnification filter
-  if(tfMagnification == TEXTURE_FILTER_MAG_NEAREST)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  else if(tfMagnification == TEXTURE_FILTER_MAG_BILINEAR)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  if(magnification == TEXTURE_FILTER_MAG_NEAREST) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  } else if(magnification == TEXTURE_FILTER_MAG_BILINEAR) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  }
 
   // Set minification filter
-  if(tfMinification == TEXTURE_FILTER_MIN_NEAREST)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  else if(tfMinification == TEXTURE_FILTER_MIN_BILINEAR)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  else if(tfMinification == TEXTURE_FILTER_MIN_NEAREST_MIPMAP)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-  else if(tfMinification == TEXTURE_FILTER_MIN_BILINEAR_MIPMAP)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-  else if(tfMinification == TEXTURE_FILTER_MIN_TRILINEAR)
-    glSamplerParameteri(m_uiSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-  m_tfMinification = tfMinification;
-  m_tfMagnification = tfMagnification;
+  if(minification == TEXTURE_FILTER_MIN_NEAREST) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  } else if(minification == TEXTURE_FILTER_MIN_BILINEAR) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  } else if(minification == TEXTURE_FILTER_MIN_NEAREST_MIPMAP) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+  } else if(minification == TEXTURE_FILTER_MIN_BILINEAR_MIPMAP) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+  } else if(minification == TEXTURE_FILTER_MIN_TRILINEAR) {
+    glSamplerParameteri(sampler_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  }
 }
 
 // Binds a texture for rendering
-void CTexture::Bind(int iTextureUnit)
+void Texture::bind(int texture)
 {
-  glActiveTexture(GL_TEXTURE0+iTextureUnit);
-  glBindTexture(GL_TEXTURE_2D, m_uiTexture);
-  glBindSampler(iTextureUnit, m_uiSampler);
+  glActiveTexture(GL_TEXTURE0 + texture);
+  glBindTexture(GL_TEXTURE_2D, texture_);
+  glBindSampler(texture, sampler_);
 }
 
 // Frees memory on the GPU of the texture
-void CTexture::Release()
+void Texture::release()
 {
-  glDeleteSamplers(1, &m_uiSampler);
-  glDeleteTextures(1, &m_uiTexture);
+  glDeleteSamplers(1, &sampler_);
+  glDeleteTextures(1, &texture_);
 }
 
-int CTexture::GetMinificationFilter()
+int Texture::minificationFilter()
 {
-  return m_tfMinification;
+  return minification_;
 }
 
-int CTexture::GetMagnificationFilter()
+int Texture::magnificationFilter()
 {
-  return m_tfMagnification;
+  return magnification_;
 }
 
-int CTexture::GetWidth()
+int Texture::width()
 {
-  return m_iWidth;
+  return width_;
 }
 
-int CTexture::GetHeight()
+int Texture::height()
 {
-  return m_iHeight;
+  return height_;
 }
 
-int CTexture::GetBPP()
+int Texture::bpp()
 {
-  return m_iBPP;
+  return bpp_;
 }

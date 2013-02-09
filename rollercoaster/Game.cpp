@@ -32,7 +32,8 @@ Source code drawn from a number of sources and examples, including contributions
 #include "camera.h"
 #include "skybox.h"
 #include "plane.h"
-#include "shaders.h"
+#include "shader.h"
+#include "shaderprogram.h"
 #include "freetypefont.h"
 #include "objmodel.h"
 #include "sphere.h"
@@ -88,8 +89,8 @@ void Game::init()
   int height = dimensions.bottom - dimensions.top;
 
   // Set the orthographic and perspective projection matrices based on the image size
-  camera_->setOrthographicProjectionMatrix(width, height); 
-  camera_->setPerspectiveProjectionMatrix(45.0f, (float) width / (float) height, 0.5f, 5000.0f);
+  camera_->setOrthographicMatrix(width, height); 
+  camera_->setPerspectiveMatrix(45.0f, (float) width / (float) height, 0.5f, 5000.0f);
 
   // Load shaders
   vector<Shader> shaders;
@@ -105,7 +106,7 @@ void Game::init()
     int shader_type = ext == "vert" ? GL_VERTEX_SHADER : (ext == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
 
     Shader shader;
-    shader.load("resources\\shaders\\" + shader_filenames[i], shader_type);
+    shader.loadShader("resources\\shaders\\" + shader_filenames[i], shader_type);
     shaders.push_back(shader);
   }
 
@@ -121,7 +122,7 @@ void Game::init()
   ShaderProgram *fonts = new ShaderProgram;
   fonts->create();
   fonts->addShader(&shaders[2]);
-  fonts->AddShader(&shaders[3]);
+  fonts->addShader(&shaders[3]);
   fonts->link();
   shader_programs_->push_back(fonts);
 
@@ -134,7 +135,7 @@ void Game::init()
   terrain_->create("resources\\textures\\", "grassfloor01.jpg", 2000.0f, 2000.0f, 50.0f); 
 
   font_->loadSystemFont("arial.ttf", 32);
-  font_->setShader(fonts);
+  font_->setShaderProgram(fonts);
 
   // Load some meshes in OBJ format
   // Downloaded from http://www.psionicgames.com/?page_id=24 on 24 Jan 2013
@@ -164,7 +165,7 @@ void Game::render()
 
   // Use the main shader program 
   ShaderProgram *main = (*shader_programs_)[0];
-  main->useProgram();
+  main->use();
   main->setUniform("bUseTexture", true);
 
   // Set the projection and modelview matrix based on the current camera location  
@@ -173,7 +174,7 @@ void Game::render()
 
   // Set light and materials in main shader program
   glm::vec4 position(-100, 100, -100, 1);
-  glm::mat3 normal_matrix = camera_->normalMatrix(modelview.Top());
+  glm::mat3 normal_matrix = camera_->normalMatrix(modelview.top());
   
   // Convert light position to eye coordinates, since lighting is done in eye coordinates
   glm::vec4 light_eye = modelview.top() * position;
@@ -293,7 +294,7 @@ void Game::renderFPS()
     glDisable(GL_DEPTH_TEST);
 
     // Use the font shader program and render the text
-    fonts->useProgram();
+    fonts->use();
 
     fonts->setUniform("matrices.modelViewMatrix", glm::mat4(1));
     fonts->setUniform("matrices.projMatrix", camera_->orthographicMatrix());

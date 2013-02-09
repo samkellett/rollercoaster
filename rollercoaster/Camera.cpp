@@ -166,9 +166,9 @@ glm::mat4 *Camera::orthographicMatrix()
 
 // Set the camera perspective projection matrix to produce a view frustum with a specific field of view, aspect ratio, 
 // and near / far clipping planes
-void Camera::setPerspectiveMatrix(float fov, float aspect_ratio, float near, float far)
+void Camera::setPerspectiveMatrix(float fov, float ratio, float close, float end)
 {
-  perspective_ = glm::perspective(fov, aspect_ratio, near, far);
+	perspective_ = glm::perspective(fov, ratio, close, end);
 }
 
 // The the camera orthographic projection matrix to match the width and height passed in

@@ -1,20 +1,29 @@
-#pragma once
+#ifndef SKYBOX_H
+#define SKYBOX_H
 
-#include "Texture.h"
-#include "VertexBufferObject.h"
+#include "texture.h"
+#include "vbo.h"
 
 // This is a class for creating and rendering a skybox
-class CSkybox
+class Skybox
 {
 public:
-  void Create(string sDirectory, string sFront, string sBack, string sLeft, string sRight, string sTop, string sBottom, float fSize);
-  void Render();
-  void Release();
+  void create(string directory, string front, string back, string left, string right, string top, string bottom, float size);
+  void render();
+  void release();
 
 private:
-  UINT m_uiVAO;
-  CVertexBufferObject m_vboData;
-  CTexture m_tTextures[6];
-  string m_sDirectory;
-  string m_sFront, m_sBack, m_sLeft, m_sRight, m_sTop, m_sBottom;
+  UINT vao_;
+  VBO vbo_;
+  Texture textures_[6];
+  string directory_;
+
+  string front_;
+  string back_;
+  string left_;
+  string right_;
+  string top_;
+  string bottom_;
 };
+
+#endif

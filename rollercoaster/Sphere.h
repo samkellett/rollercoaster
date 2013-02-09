@@ -1,20 +1,24 @@
-#pragma once
+#ifndef SPHERE_H
+#define SPHERE_H
 
-#include "Texture.h"
-#include "VertexBufferObject.h"
+#include "texture.h"
+#include "vbo.h"
 
 // Class for generating a unit sphere
-class CSphere
+class Sphere
 {
 public:
-  void Create(string a_sDirectory, string a_sFront, int slicesIn, int stacksIn);
-  void Render();
-  void Release();
+  void create(string directory, string front, int slices, int stacks);
+  void render();
+  void release();
+
 private:
-  UINT m_uiVAO;
-  CVertexBufferObject m_vboData;
-  CTexture m_tTexture;
-  string m_sDirectory;
-  string m_sFilename;
-  int m_iNumTriangles;
+  UINT vao_;
+  VBO vbo_;
+  Texture texture_;
+  string directory_;
+  string filename_;
+  int triangles_;
 };
+
+#endif

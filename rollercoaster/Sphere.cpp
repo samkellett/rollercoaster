@@ -1,55 +1,55 @@
-#include "Common.h"
+#include "sphere.h"
+
+#include "common.h"
 
 #define _USE_MATH_DEFINES
-
-#include "Sphere.h"
 #include <math.h>
 
 // Create a unit sphere 
-void CSphere::Create(string a_sDirectory, string a_sFilename, int slicesIn, int stacksIn)
+void Sphere::create(string directory, string filename, int slices, int stacks)
 {
   // check if filename passed in -- if so, load texture
+  texture_.load(directory + filename);
 
-  m_tTexture.Load(a_sDirectory+a_sFilename);
+  directory_ = directory;
+  filename_ = filename;
 
-  m_sDirectory = a_sDirectory;
-  m_sFilename = a_sFilename;
-
-  m_tTexture.SetFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR);
-  m_tTexture.SetSamplerParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-  m_tTexture.SetSamplerParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  texture_.setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR);
+  texture_.setSamplerParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  texture_.setSamplerParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
   
-  glGenVertexArrays(1, &m_uiVAO);
-  glBindVertexArray(m_uiVAO);
+  glGenVertexArrays(1, &vao_);
+  glBindVertexArray(vao_);
 
-  m_vboData.Create();
-  m_vboData.Bind();
+  vbo_.create();
+  vbo_.bind();
 
   std::vector<glm::vec3> vertices;
-  std::vector<glm::vec2> textureCoords;
+  std::vector<glm::vec2> texture_coords;
   std::vector<glm::vec3> normals;
 
-  for (int stacks = 0; stacks < stacksIn; stacks++) {
-    float phi = (stacks / (float) stacksIn) * (float) M_PI;
-    float nextPhi;
-    if (phi != stacksIn - 1)
-      nextPhi = ((stacks + 1) / (float) stacksIn) * (float) M_PI;
-    else
-      nextPhi = (float) M_PI;
+  for (int i = 0; i < stacks; ++i) {
+    float phi = (i / (float) stacks) * (float) M_PI;
+    float next_phi;
+    if (phi != stacks - 1) {
+      next_phi = ((i + 1) / (float) stacks) * (float) M_PI;
+    } else {
+      next_phi = (float) M_PI;
+    }
 
-    for (int slices = 0; slices < slicesIn; slices++) {
-      float theta = (slices / (float) slicesIn) * 2 * (float) M_PI;
-      float nextTheta = (((slices + 1) % slicesIn) / (float) slicesIn) * 2 * (float) M_PI;
+    for (int j = 0; j < slices; ++j) {
+      float theta = (j / (float) slices) * 2 * (float) M_PI;
+      float next_theta = (((j + 1) % slices) / (float) slices) * 2 * (float) M_PI;
       
       glm::vec3 v1 = glm::vec3(cos(theta) * sin(phi), sin(theta) * sin(phi), cos(phi));
-      glm::vec3 v2 = glm::vec3(cos(nextTheta) * sin(phi), sin(nextTheta) * sin(phi), cos(phi));
-      glm::vec3 v3 = glm::vec3(cos(theta) * sin(nextPhi), sin(theta) * sin(nextPhi), cos(nextPhi));
-      glm::vec3 v4 = glm::vec3(cos(nextTheta) * sin(nextPhi), sin(nextTheta) * sin(nextPhi), cos(nextPhi));
+      glm::vec3 v2 = glm::vec3(cos(next_theta) * sin(phi), sin(next_theta) * sin(phi), cos(phi));
+      glm::vec3 v3 = glm::vec3(cos(theta) * sin(next_phi), sin(theta) * sin(next_phi), cos(next_phi));
+      glm::vec3 v4 = glm::vec3(cos(next_theta) * sin(next_phi), sin(next_theta) * sin(next_phi), cos(next_phi));
       
-      glm::vec2 t1 = glm::vec2(slices / (float) slicesIn, stacks / (float) stacksIn);
-      glm::vec2 t2 = glm::vec2((slices + 1) / (float) slicesIn, stacks / (float) stacksIn);
-      glm::vec2 t3 = glm::vec2(slices / (float) slicesIn, (stacks + 1) / (float) stacksIn);
-      glm::vec2 t4 = glm::vec2((slices + 1) / (float) slicesIn, (stacks + 1) / (float) stacksIn);
+      glm::vec2 t1 = glm::vec2(j / (float) slices, i / (float) stacks);
+      glm::vec2 t2 = glm::vec2((j + 1) / (float) slices, i / (float) stacks);
+      glm::vec2 t3 = glm::vec2(j / (float) slices, (i + 1) / (float) stacks);
+      glm::vec2 t4 = glm::vec2((j + 1) / (float) slices, (i + 1) / (float) stacks);
 
       vertices.push_back(v1);
       vertices.push_back(v4);
@@ -67,55 +67,53 @@ void CSphere::Create(string a_sDirectory, string a_sFilename, int slicesIn, int 
       normals.push_back(v3);
       normals.push_back(v4);
 
-      textureCoords.push_back(t1);
-      textureCoords.push_back(t4);
-      textureCoords.push_back(t2);
+      texture_coords.push_back(t1);
+      texture_coords.push_back(t4);
+      texture_coords.push_back(t2);
 
-      textureCoords.push_back(t1);
-      textureCoords.push_back(t3);
-      textureCoords.push_back(t4);
+      texture_coords.push_back(t1);
+      texture_coords.push_back(t3);
+      texture_coords.push_back(t4);
     }
   }
 
 
-  for (int i = 0; i < (int) vertices.size(); i++)
-  {
-    m_vboData.AddData(&vertices[i], sizeof(glm::vec3));
-    m_vboData.AddData(&textureCoords[i], sizeof(glm::vec2));
-    m_vboData.AddData(&normals[i], sizeof(glm::vec3));
+  for (int i = 0; i < (int) vertices.size(); ++i) {
+    vbo_.addData(&vertices[i], sizeof(glm::vec3));
+    vbo_.addData(&texture_coords[i], sizeof(glm::vec2));
+    vbo_.addData(&normals[i], sizeof(glm::vec3));
   }
-  m_iNumTriangles = vertices.size() /  3;
-  m_vboData.UploadDataToGPU(GL_STATIC_DRAW);
+  triangles_ = vertices.size() /  3;
+  vbo_.uploadDataToGPU(GL_STATIC_DRAW);
 
-  GLsizei stride = 2*sizeof(glm::vec3)+sizeof(glm::vec2);
+  GLsizei stride = 2 * sizeof(glm::vec3) + sizeof(glm::vec2);
 
   // Vertex positions
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
+
   // Texture coordinates
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(glm::vec3));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *) sizeof(glm::vec3));
+
   // Normal vectors
   glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(sizeof(glm::vec3)+sizeof(glm::vec2)));
-  
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void *) (sizeof(glm::vec3) + sizeof(glm::vec2)));
 }
 
 // Render the sphere as a set of triangles
-void CSphere::Render()
+void Sphere::render()
 {
-  glBindVertexArray(m_uiVAO);
+  glBindVertexArray(vao_);
 
-
-  m_tTexture.Bind();
-  glDrawArrays(GL_TRIANGLES, 0, m_iNumTriangles*3);
-
+  texture_.bind();
+  glDrawArrays(GL_TRIANGLES, 0, triangles_ * 3);
 }
 
 // Release memory on the GPU 
-void CSphere::Release()
+void Sphere::release()
 {
-  m_tTexture.Release();
-  glDeleteVertexArrays(1, &m_uiVAO);
-  m_vboData.Release();
+  texture_.release();
+  glDeleteVertexArrays(1, &vao_);
+  vbo_.release();
 }

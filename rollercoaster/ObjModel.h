@@ -1,28 +1,31 @@
-#pragma once
+#ifndef OBJMODEL_H
+#define OBJMODEL_H
 
-#include "Common.h"
-#include "Texture.h"
-#include "VertexBufferObject.h"
+#include "common.h"
+#include "texture.h"
+#include "vbo.h"
 
 // Class for handling obj files
-class CObjModel
+class ObjModel
 {
 public:
-  CObjModel();
-  bool Load(string sFileName, string sMtlFileName);
-  void Render();
-  void Release();
+  ObjModel();
+  bool load(string file, string material);
+  void render();
+  void release();
 
-  int GetPolygonCount();
+  int polygonCount();
 
 private:
-  bool m_bLoaded;
-  int m_iAttrBitField;
-  int m_iNumFaces;
-  CVertexBufferObject m_vboModelData;
-  UINT m_uiVAO;
-  CTexture m_tAmbientTexture;
+  bool loaded_;
+  int attributes_;
+  int faces_;
+  VBO vbo_;
+  UINT vao_;
+  Texture texture_;
 
-  bool LoadMaterial(string sFullMtlFileName);
+  bool loadMaterial(string filename);
 
 };
+
+#endif

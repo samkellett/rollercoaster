@@ -3,6 +3,10 @@
 #include "include/glm/gtc/matrix_transform.hpp"
 
 #include "common.h"
+#include "shader.h"
+#include "shaderprogram.h"
+
+#pragma comment(lib, "lib/freetype2410.lib")
 
 using namespace std;
 
@@ -120,7 +124,7 @@ bool FreeTypeFont::loadFont(string file, int size)
   FT_Done_Face(freetype_face_);
   FT_Done_FreeType(freetype_);
   
-  vbo_.uploadData(GL_STATIC_DRAW);
+  vbo_.uploadDataToGPU(GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2) * 2, 0);
@@ -152,7 +156,7 @@ void FreeTypeFont::print(string text, int x, int y, int size)
   }
 
   glBindVertexArray(vao_);
-  fonts_->SetUniform("gSampler", 0);
+  fonts_->setUniform("gSampler", 0);
 
   glEnable(GL_BLEND);
 
@@ -162,7 +166,7 @@ void FreeTypeFont::print(string text, int x, int y, int size)
   int cursor_y = y;
 
   if(size == -1) {
-    size = m_iLoadedPixelSize;
+    size = loaded_size_;
   }
 
   float fScale = (float) size / (float) loaded_size_;
@@ -179,7 +183,7 @@ void FreeTypeFont::print(string text, int x, int y, int size)
 
         glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3((float) cursor_x, (float) cursor_y, 0.0f));
         modelview = glm::scale(modelview, glm::vec3(fScale));
-        fonts_->SetUniform("matrices.modelViewMatrix", modelview);
+        fonts_->setUniform("matrices.modelViewMatrix", modelview);
         
         // Draw character
         glDrawArrays(GL_TRIANGLE_STRIP, index*4, 4);
@@ -222,5 +226,5 @@ void FreeTypeFont::release()
 // Sets shader programme that font uses
 void FreeTypeFont::setShaderProgram(ShaderProgram* shader_program)
 {
-  shader_program_ = shader_program;
+  fonts_ = shader_program;
 }

@@ -5,8 +5,9 @@
 #include FT_FREETYPE_H
 
 #include "texture.h"
-#include "shaders.h"
 #include "vbo.h"
+
+class ShaderProgram;
 
 // This class is a wrapper for FreeType fonts and their usage with OpenGL
 class FreeTypeFont
@@ -24,7 +25,7 @@ public:
 
   void release();
 
-  void setShaderProgram(ShaderProgram* shader_program);
+  void setShaderProgram(ShaderProgram *shader_program);
 
 private:
   void createChar(int index);

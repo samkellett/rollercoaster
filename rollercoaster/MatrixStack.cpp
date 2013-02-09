@@ -8,12 +8,12 @@
 
 namespace glutil
 {
-  void MatrixStack::Rotate( const glm::vec3 axis, float angDegCCW )
+  void MatrixStack::rotate( const glm::vec3 axis, float angDegCCW )
   {
     m_currMatrix = glm::rotate(m_currMatrix, angDegCCW, axis);
   }
 
-  void MatrixStack::RotateRadians( const glm::vec3 axisOfRotation, float angRadCCW )
+  void MatrixStack::rotateRadians( const glm::vec3 axisOfRotation, float angRadCCW )
   {
     float fCos = cosf(angRadCCW);
     float fInvCos = 1.0f - fCos;
@@ -37,72 +37,72 @@ namespace glutil
     m_currMatrix *= theMat;
   }
 
-  void MatrixStack::RotateX( float angDegCCW )
+  void MatrixStack::rotateX( float angDegCCW )
   {
-    Rotate(glm::vec3(1.0f, 0.0f, 0.0f), angDegCCW);
+    rotate(glm::vec3(1.0f, 0.0f, 0.0f), angDegCCW);
   }
 
-  void MatrixStack::RotateY( float angDegCCW )
+  void MatrixStack::rotateY( float angDegCCW )
   {
-    Rotate(glm::vec3(0.0f, 1.0f, 0.0f), angDegCCW);
+    rotate(glm::vec3(0.0f, 1.0f, 0.0f), angDegCCW);
   }
 
-  void MatrixStack::RotateZ( float angDegCCW )
+  void MatrixStack::rotateZ( float angDegCCW )
   {
-    Rotate(glm::vec3(0.0f, 0.0f, 1.0f), angDegCCW);
+    rotate(glm::vec3(0.0f, 0.0f, 1.0f), angDegCCW);
   }
 
-  void MatrixStack::Scale( const glm::vec3 &scaleVec )
+  void MatrixStack::scale( const glm::vec3 &scaleVec )
   {
     m_currMatrix = glm::scale(m_currMatrix, scaleVec);
   }
 
-  void MatrixStack::Translate( const glm::vec3 &offsetVec )
+  void MatrixStack::translate( const glm::vec3 &offsetVec )
   {
     m_currMatrix = glm::translate(m_currMatrix, offsetVec);
   }
 
-  void MatrixStack::Perspective( float degFOV, float aspectRatio, float zNear, float zFar )
+  void MatrixStack::perspective( float degFOV, float aspectRatio, float zNear, float zFar )
   {
     m_currMatrix *= glm::perspective(degFOV, aspectRatio, zNear, zFar);
   }
 
-  void MatrixStack::Orthographic( float left, float right, float bottom, float top,
+  void MatrixStack::orthographic( float left, float right, float bottom, float top,
     float zNear, float zFar )
   {
     m_currMatrix *= glm::ortho(left, right, bottom, top, zNear, zFar);
   }
 
-  void MatrixStack::PixelPerfectOrtho( glm::ivec2 size, glm::vec2 depthRange, bool isTopLeft /*= true*/ )
+  void MatrixStack::pixelPerfectOrtho( glm::ivec2 size, glm::vec2 depthRange, bool isTopLeft /*= true*/ )
   {
     if(isTopLeft)
     {
-      Translate(-1.0f, 1.0f, (depthRange.x + depthRange.y) / 2.0f);
-      Scale(2.0f / size.x, -2.0f / size.y, 1.0f);
+      translate(-1.0f, 1.0f, (depthRange.x + depthRange.y) / 2.0f);
+      scale(2.0f / size.x, -2.0f / size.y, 1.0f);
     }
     else
     {
-      Translate(-1.0f, -1.0f, (depthRange.x + depthRange.y) / 2.0f);
-      Scale(2.0f / size.x, 2.0f / size.y, 2.0f / (depthRange.y - depthRange.x));
+      translate(-1.0f, -1.0f, (depthRange.x + depthRange.y) / 2.0f);
+      scale(2.0f / size.x, 2.0f / size.y, 2.0f / (depthRange.y - depthRange.x));
     }
   }
 
-  void MatrixStack::LookAt( const glm::vec3 &cameraPos, const glm::vec3 &lookatPos, const glm::vec3 &upDir )
+  void MatrixStack::lookAt( const glm::vec3 &cameraPos, const glm::vec3 &lookatPos, const glm::vec3 &upDir )
   {
     m_currMatrix *= glm::lookAt(cameraPos, lookatPos, upDir);
   }
 
-  void MatrixStack::ApplyMatrix( const glm::mat4 &theMatrix )
+  void MatrixStack::applyMatrix( const glm::mat4 &theMatrix )
   {
     m_currMatrix *= theMatrix;
   }
 
-  void MatrixStack::SetMatrix( const glm::mat4 &theMatrix )
+  void MatrixStack::setMatrix( const glm::mat4 &theMatrix )
   {
     m_currMatrix = theMatrix;
   }
 
-  void MatrixStack::SetIdentity()
+  void MatrixStack::setIdentity()
   {
     m_currMatrix = glm::mat4(1.0f);
   }

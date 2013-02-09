@@ -1,22 +1,27 @@
-#pragma once
+#ifndef PLANE_H
+#define PLANE_H
 
-#include "Texture.h"
-#include "vertexBufferObject.h"
+#include "texture.h"
+#include "vbo.h"
+
 #include "./include/glm/gtc/type_ptr.hpp"
 
 // Class for generating a xz plane of a given size
-class CPlane
+class Plane
 {
 public:
-  void Create(string sDirectory, string sFilename, float fWidth, float fHeight, float fTextureRepeat);
-  void Render();
-  void Release();
+  void create(string directory, string filename, float width, float height, float texture_repeat);
+  void render();
+  void release();
+
 private:
-  UINT m_uiVAO;
-  CVertexBufferObject m_vboRenderData;
-  CTexture m_tTexture;
-  string m_sDirectory;
-  string m_sFilename;
-  float m_fwidth;
-  float m_fheight;
+  UINT vao_;
+  VBO vbo_;
+  Texture texture_;
+  string directory_;
+  string filename_;
+  float width_;
+  float height_;
 };
+
+#endif

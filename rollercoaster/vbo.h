@@ -1,4 +1,7 @@
-#pragma once
+#ifndef VBO_H
+#define VBO_H
+
+#include "common.h"
 
 #include "include/gl/glew.h"
 #include <gl/gl.h>
@@ -7,27 +10,37 @@
 class VBO
 {
 public:
-  CVertexBufferObject();
+  VBO();
 
-  void Create(int iSize = 0);            // Creates a VBO
-  void Bind(int iBufferType = GL_ARRAY_BUFFER);  // Binds the VBO
-  void Release();                  // Releases the VBO
+  // Creates a VBO
+  void create(int size = 0);
 
-  void AddData(void* ptrData, UINT uiDataSize);  // Add data to the VBO
-  void UploadDataToGPU(int iUsageHint);      // Upload the VBO to the GPU
+  // Binds the VBO
+  void bind(int type = GL_ARRAY_BUFFER);
 
-  void *MapBufferToMemory(int iUsageHint);
-  void *MapSubBufferToMemory(int iUsageHint, UINT uiOffset, UINT uiLength);
-  void UnmapBuffer();
+  // Releases the VBO
+  void release();
 
-  void* GetDataPointer();
-  UINT GetBuffer();
+  // Add data to the VBO
+  void addData(void* data, UINT size);
+
+  // Upload the VBO to the GPU
+  void uploadDataToGPU(int usage);
+
+  void *mapBufferToMemory(int usage);
+  void *mapSubBufferToMemory(int usage, UINT offset, UINT length);
+  void unmapBuffer();
+
+  void* data();
+  UINT buffer();
   
 private:
-  UINT m_uiBuffer;
-  int m_iSize;
-  int m_iBufferType;
-  vector<BYTE> m_data;
+  UINT buffer_;
+  int size_;
+  int type_;
+  vector<BYTE> data_;
 
-  bool m_bDataUploaded;
+  bool uploaded_;
 };
+
+#endif

@@ -1,91 +1,95 @@
-#include "Common.h"
-#include "vertexBufferObject.h"
+#include "vbo.h"
 
+#include "common.h"
 
 // Constructor -- initialise member variable m_bDataUploaded to false
-CVertexBufferObject::CVertexBufferObject()
+VBO::VBO() :
+  uploaded_(false)
 {
-  m_bDataUploaded = false;
 }
 
-
 // Create a VBO and optionally reserve space for data
-void CVertexBufferObject::Create(int iSize)
+void VBO::create(int size)
 {
-  glGenBuffers(1, &m_uiBuffer);
-  m_data.reserve(iSize);
-  m_iSize = iSize;
+  glGenBuffers(1, &buffer_);
+  
+  data_.reserve(size);
+  size_ = size;
 }
 
 // Release the VBO and any associated data
-void CVertexBufferObject::Release()
+void VBO::release()
 {
-  glDeleteBuffers(1, &m_uiBuffer);
-  m_bDataUploaded = false;
-  m_data.clear();
-}
+  glDeleteBuffers(1, &buffer_);
 
+  uploaded_ = false;
+  data_.clear();
+}
 
 // Maps the buffer to memory and returns a pointer to data.  
 // iUsageHint - GL_READ_ONLY, GL_WRITE_ONLY...
-void* CVertexBufferObject::MapBufferToMemory(int iUsageHint)
+void *VBO::mapBufferToMemory(int usage)
 {
-  if(!m_bDataUploaded)return NULL;
-  void* ptrRes = glMapBuffer(m_iBufferType, iUsageHint);
-  return ptrRes;
-}
+  if(!uploaded_) {
+    return NULL;
+  }
 
+  void *result = glMapBuffer(type_, usage);
+  return result;
+}
 
 // Maps specified part of a buffer to memory and returns a pointer to data. 
 // uiOffset is the data offset, and uiLength is the length of the data. 
-void* CVertexBufferObject::MapSubBufferToMemory(int iUsageHint, UINT uiOffset, UINT uiLength)
+void* VBO::mapSubBufferToMemory(int usage, UINT offset, UINT length)
 {
-  if(!m_bDataUploaded)return NULL;
-  void* ptrRes = glMapBufferRange(m_iBufferType, uiOffset, uiLength, iUsageHint);
-  return ptrRes;
+  if(!uploaded_) {
+    return NULL;
+  }
+
+  void *result = glMapBufferRange(type_, offset, length, usage);
+  return result;
 }
 
 // Unmaps a previously mapped buffer
-void CVertexBufferObject::UnmapBuffer()
+void VBO::unmapBuffer()
 {
-  glUnmapBuffer(m_iBufferType);
+  glUnmapBuffer(type_);
 }
 
 // Binds a VBO.  iBufferType is the buffer type (e.g., GL_ARRAY_BUFFER, ...)
-void CVertexBufferObject::Bind(int iBufferType)
+void VBO::bind(int type)
 {
-  m_iBufferType = iBufferType;
-  glBindBuffer(m_iBufferType, m_uiBuffer);
+  type_ = type;
+  glBindBuffer(type_, buffer_);
 }
-
 
 // Uploads the data to the GPU.  Afterwards, the data can be cleared.  
 // iUsageHint - GL_STATIC_DRAW, GL_DYNAMIC_DRAW...
-void CVertexBufferObject::UploadDataToGPU(int iDrawingHint)
+void VBO::uploadDataToGPU(int drawing)
 {
-  glBufferData(m_iBufferType, m_data.size(), &m_data[0], iDrawingHint);
-  m_bDataUploaded = true;
-  m_data.clear();
+  glBufferData(type_, data_.size(), &data_[0], drawing);
+  uploaded_ = true;
+  data_.clear();
 }
 
 // Adds data to the VBO.  
-void CVertexBufferObject::AddData(void* ptrData, UINT uiDataSize)
+void VBO::addData(void *data, UINT size)
 {
-  m_data.insert(m_data.end(), (BYTE*)ptrData, (BYTE*)ptrData+uiDataSize);
+  data_.insert(data_.end(), (BYTE *) data, (BYTE *) data + size);
 }
 
 // Gets a pointer to the data.  Note this is only valid before uploading, since the data is cleared on upload.
-void* CVertexBufferObject::GetDataPointer()
+void* VBO::data()
 {
-  if (m_bDataUploaded)
+  if (uploaded_) {
     return NULL;
-  return (void*) m_data[0];
+  }
+
+  return (void*) data_[0];
 }
 
 // Returns the ID of the VBO
-UINT CVertexBufferObject::GetBuffer()
+UINT VBO::buffer()
 {
-  return m_uiBuffer;
+  return buffer_;
 }
-
-

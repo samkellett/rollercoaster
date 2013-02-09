@@ -1,9 +1,12 @@
-#pragma once
+#ifndef TEXTURE_H
+#define TEXTURE_H
+
+#include "common.h"
 
 #include "include/gl/glew.h"
 #include <gl/gl.h>
 
-enum ETextureFiltering
+enum TextureFiltering
 {
   TEXTURE_FILTER_MAG_NEAREST = 0, // Nearest criterion for magnification
   TEXTURE_FILTER_MAG_BILINEAR, // Bilinear criterion for magnification
@@ -15,35 +18,41 @@ enum ETextureFiltering
 };
 
 // Class that provides a texture for texture mapping in OpenGL
-class CTexture
+class Texture
 {
 public:
-  void CreateFromData(BYTE* bData, int iWidth, int iHeight, int iBPP, GLenum format, bool bGenerateMipMaps = false);
-  bool Load(string sPath, bool bGenerateMipMaps = false);
-  void Bind(int iTextureUnit = 0);
+  Texture();
+  
+  void createFromData(BYTE *data, int width, int height, int bpp, GLenum format, bool mipmaps = false);
+  bool load(string path, bool mipmaps = false);
+  void bind(int texture = 0);
 
-  void SetFiltering(int tfMagnification, int tfMinification);
+  void setFiltering(int magnification, int minification);
 
-  void SetSamplerParameter(GLenum parameter, GLenum value);
+  void setSamplerParameter(GLenum parameter, GLenum value);
 
-  int GetMinificationFilter();
-  int GetMagnificationFilter();
+  int minificationFilter();
+  int magnificationFilter();
 
-  int GetWidth();
-  int GetHeight();
-  int GetBPP();
+  int width();
+  int height();
+  int bpp();
 
-  void Release();
+  void release();
 
-  CTexture();
 private:
-  int m_iWidth, m_iHeight, m_iBPP; // Texture width, height, and bytes per pixel
-  UINT m_uiTexture; // Texture name
-  UINT m_uiSampler; // Sampler name
-  bool m_bMipMapsGenerated;
+  int width_;
+  int height_;
+  int bpp_;
 
-  int m_tfMinification, m_tfMagnification;
+  UINT texture_; // Texture name
+  UINT sampler_; // Sampler name
+  bool mipmaps_;
 
-  string m_sPath;
+  int minification_;
+  int magnification_;
+
+  string path_;
 };
 
+#endif

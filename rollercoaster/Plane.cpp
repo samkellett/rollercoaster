@@ -1,95 +1,92 @@
-#include "Common.h"
+#include "plane.h"
 
-#include "Plane.h"
+#include "common.h"
 
 // Create the plane, including its geometry, texture mapping, normal, and colour
-void CPlane::Create(string sDirectory, string sFilename, float fWidth, float fHeight, float fTextureRepeat)
+void Plane::create(string directory, string filename, float width, float height, float texture_repeat)
 {
-  
-  m_fwidth = fWidth;
-  m_fheight = fHeight;
+  width_ = width;
+  height_ = height;
 
   // Load the texture
-  m_tTexture.Load(sDirectory+sFilename, true);
+  texture_.load(directory + filename, true);
 
-  m_sDirectory = sDirectory;
-  m_sFilename = sFilename;
+  directory_ = directory;
+  filename_ = filename;
 
   // Set parameters for texturing using sampler object
-  m_tTexture.SetFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR_MIPMAP);
-  m_tTexture.SetSamplerParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-  m_tTexture.SetSamplerParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  texture_.setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR_MIPMAP);
+  texture_.setSamplerParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  texture_.setSamplerParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
   
   // Use VAO to store state associated with vertices
-  glGenVertexArrays(1, &m_uiVAO);
-  glBindVertexArray(m_uiVAO);
+  glGenVertexArrays(1, &vao_);
+  glBindVertexArray(vao_);
 
   // Create a VBO
-  m_vboRenderData.Create();
-  m_vboRenderData.Bind();
+  vbo_.create();
+  vbo_.bind();
 
-  float fhalfWidth = m_fwidth / 2.0f;
-  float fhalfHeight = m_fheight / 2.0f;
+  float half_width = width_ / 2.0f;
+  float half_height = height_ / 2.0f;
 
   // Vertex positions
-  glm::vec3 vPlaneVertices[4] = 
-  {
-    glm::vec3(-fhalfWidth, 0.0f, -fhalfHeight), 
-    glm::vec3(fhalfWidth, 0.0f, -fhalfHeight), 
-    glm::vec3(-fhalfWidth, 0.0f, fhalfHeight), 
-    glm::vec3(fhalfWidth, 0.0f, fhalfHeight), 
+  glm::vec3 plane_vertices[4] = {
+    glm::vec3(-half_width, 0.0f, -half_height), 
+    glm::vec3(half_width, 0.0f, -half_height), 
+    glm::vec3(-half_width, 0.0f, half_height), 
+    glm::vec3(half_width, 0.0f, half_height), 
   };
 
   // Texture coordinates
-  glm::vec2 vPlaneTexCoords[4] =
-  {
+  glm::vec2 texture_coords[4] = {
     glm::vec2(0.0f, 0.0f), 
-    glm::vec2(fTextureRepeat, 0.0f), 
-    glm::vec2(0.0f, fTextureRepeat), 
-    glm::vec2(fTextureRepeat, fTextureRepeat)
+    glm::vec2(texture_repeat, 0.0f), 
+    glm::vec2(0.0f, texture_repeat), 
+    glm::vec2(texture_repeat, texture_repeat)
   };
 
   // Plane normal
-  glm::vec3 vPlaneNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+  glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f);
 
   // Put the vertex attributes in the VBO
-  for (int i = 0; i < 4; i++) {
-    m_vboRenderData.AddData(&vPlaneVertices[i], sizeof(glm::vec3));
-    m_vboRenderData.AddData(&vPlaneTexCoords[i], sizeof(glm::vec2));
-    m_vboRenderData.AddData(&vPlaneNormal, sizeof(glm::vec3));
+  for (int i = 0; i < 4; ++i) {
+    vbo_.addData(&plane_vertices[i], sizeof(glm::vec3));
+    vbo_.addData(&texture_coords[i], sizeof(glm::vec2));
+    vbo_.addData(&normal, sizeof(glm::vec3));
   }
 
   // Upload the VBO to the GPU
-  m_vboRenderData.UploadDataToGPU(GL_STATIC_DRAW);
+  vbo_.uploadDataToGPU(GL_STATIC_DRAW);
 
   // Set the vertex attribute locations
-  GLsizei istride = 2*sizeof(glm::vec3)+sizeof(glm::vec2);
+  GLsizei stride = 2 * sizeof(glm::vec3) + sizeof(glm::vec2);
 
   // Vertex positions
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, istride, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
+
   // Texture coordinates
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, istride, (void*)sizeof(glm::vec3));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*) sizeof(glm::vec3));
+
   // Normal vectors
   glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, istride, (void*)(sizeof(glm::vec3)+sizeof(glm::vec2)));
-  
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*) (sizeof(glm::vec3) + sizeof(glm::vec2)));
 }
 
 // Render the plane as a triangle strip
-void CPlane::Render()
+void Plane::render()
 {
-  glBindVertexArray(m_uiVAO);
-  m_tTexture.Bind();
+  glBindVertexArray(vao_);
+  texture_.bind();
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  
 }
 
 // Release resources
-void CPlane::Release()
+void Plane::release()
 {
-  m_tTexture.Release();
-  glDeleteVertexArrays(1, &m_uiVAO);
-  m_vboRenderData.Release();
+  texture_.release();
+  glDeleteVertexArrays(1, &vao_);
+  vbo_.release();
 }
