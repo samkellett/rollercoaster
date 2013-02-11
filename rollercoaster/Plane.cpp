@@ -3,7 +3,7 @@
 #include "common.h"
 
 // Create the plane, including its geometry, texture mapping, normal, and colour
-void Plane::create(string directory, string filename, float width, float height, float texture_repeat)
+void Plane::create(std::string directory, std::string filename, float width, float height, float texture_repeat)
 {
   width_ = width;
   height_ = height;

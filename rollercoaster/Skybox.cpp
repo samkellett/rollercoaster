@@ -5,7 +5,7 @@
 #include "include/glm/gtc/type_ptr.hpp"
 
 // Create a skybox of a given size with six textures
-void Skybox::create(string directory, string front, string back, string left, string right, string top, string bottom, float size)
+void Skybox::create(std::string directory, std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom, float size)
 {
   textures_[0].load(directory + front);
   textures_[1].load(directory + back);

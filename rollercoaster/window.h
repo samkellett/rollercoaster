@@ -34,7 +34,7 @@ private:
   Window(const Window&);
   void operator=(const Window&);
 
-  void create(string title);
+  void create(std::string title);
   void initOpenGL();
   bool initGLEW();
   void registerOpenGLClass(HINSTANCE hInstance);
@@ -49,7 +49,7 @@ private:
   LPSTR class_;
   RECT  dimensions_;
 
-  string name_;
+  std::string name_;
 };
 
 #endif

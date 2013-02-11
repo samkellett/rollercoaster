@@ -15,12 +15,12 @@ class FreeTypeFont
 public:
   FreeTypeFont();
 
-  bool loadFont(string file, int size);
-  bool loadSystemFont(string name, int size);
+  bool loadFont(std::string file, int size);
+  bool loadSystemFont(std::string name, int size);
 
-  int textWidth(string text, int size);
+  int textWidth(std::string text, int size);
 
-  void print(string sText, int x, int y, int size = -1);
+  void print(std::string sText, int x, int y, int size = -1);
   void printf(int x, int y, int size, char* text, ...);
 
   void release();

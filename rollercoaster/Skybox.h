@@ -8,7 +8,7 @@
 class Skybox
 {
 public:
-  void create(string directory, string front, string back, string left, string right, string top, string bottom, float size);
+  void create(std::string directory, std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom, float size);
   void render();
   void release();
 
@@ -16,14 +16,14 @@ private:
   UINT vao_;
   VBO vbo_;
   Texture textures_[6];
-  string directory_;
+  std::string directory_;
 
-  string front_;
-  string back_;
-  string left_;
-  string right_;
-  string top_;
-  string bottom_;
+  std::string front_;
+  std::string back_;
+  std::string left_;
+  std::string right_;
+  std::string top_;
+  std::string bottom_;
 };
 
 #endif

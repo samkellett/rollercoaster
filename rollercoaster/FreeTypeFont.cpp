@@ -8,8 +8,6 @@
 
 #pragma comment(lib, "lib/freetype2410.lib")
 
-using namespace std;
-
 FreeTypeFont::FreeTypeFont() :
   loaded_(false)
 {
@@ -64,7 +62,7 @@ void FreeTypeFont::createChar(int index)
   bearing_y_[index] = freetype_face_->glyph->metrics.horiBearingY >> 6;
   char_height_[index] = freetype_face_->glyph->metrics.height >> 6;
 
-  new_line_ = max(new_line_, (int) (freetype_face_->glyph->metrics.height >> 6));
+  new_line_ = std::max(new_line_, (int) (freetype_face_->glyph->metrics.height >> 6));
 
   // Rendering data, texture coordinates are always the same, so now we waste a little memory
   glm::vec2 quad[] =
@@ -93,7 +91,7 @@ void FreeTypeFont::createChar(int index)
 
 
 // Loads an entire font with the given path sFile and pixel size iPXSize
-bool FreeTypeFont::loadFont(string file, int size)
+bool FreeTypeFont::loadFont(std::string file, int size)
 {
   BOOL error = FT_Init_FreeType(&freetype_);
   
@@ -135,12 +133,12 @@ bool FreeTypeFont::loadFont(string file, int size)
 }
 
 // Loads a system font with given name (sName) and pixel size (iPXSize)
-bool FreeTypeFont::loadSystemFont(string name, int size)
+bool FreeTypeFont::loadSystemFont(std::string name, int size)
 {
   char windows_directory[512]; 
   GetWindowsDirectory(windows_directory, 512);
   
-  string path = windows_directory;
+  std::string path = windows_directory;
   path += "\\Fonts\\";
   path += name;
 
@@ -149,7 +147,7 @@ bool FreeTypeFont::loadSystemFont(string name, int size)
 
 
 // Prints text at the specified location (x, y) with the given pixel size (size)
-void FreeTypeFont::print(string text, int x, int y, int size)
+void FreeTypeFont::print(std::string text, int x, int y, int size)
 {
   if(!loaded_) {
     return;

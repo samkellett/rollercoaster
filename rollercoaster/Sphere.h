@@ -8,7 +8,7 @@
 class Sphere
 {
 public:
-  void create(string directory, string front, int slices, int stacks);
+  void create(std::string directory, std::string front, int slices, int stacks);
   void render();
   void release();
 
@@ -16,8 +16,8 @@ private:
   UINT vao_;
   VBO vbo_;
   Texture texture_;
-  string directory_;
-  string filename_;
+  std::string directory_;
+  std::string filename_;
   int triangles_;
 };
 

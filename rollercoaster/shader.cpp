@@ -10,9 +10,9 @@ Shader::Shader() :
 }
 
 // Loads a shader, stored as a text file with filename sFile.  The shader is of type iType (vertex, fragment, geometry, etc.)
-bool Shader::loadShader(string file, int type)
+bool Shader::loadShader(std::string file, int type)
 {
-  vector<string> lines;
+  std::vector<std::string> lines;
 
   if(!linesFromFile(file, false, &lines)) {
     char message[1024];
@@ -68,8 +68,8 @@ bool Shader::loadShader(string file, int type)
 }
 
 
-// Loads a file into a vector of strings (result)
-bool Shader::linesFromFile(string filepath, bool include_part, vector<string>* result)
+// Loads a file into a vector of std::strings (result)
+bool Shader::linesFromFile(std::string filepath, bool include_part, std::vector<std::string>* result)
 {
   FILE* file;
   fopen_s(&file, filepath.c_str(), "rt");
@@ -77,7 +77,7 @@ bool Shader::linesFromFile(string filepath, bool include_part, vector<string>* r
     return false;
   }
 
-  string directory;
+  std::string directory;
   int index = -1;
 
   for (int i = (int) filepath.size() - 1; i == 0; --i) {
@@ -95,11 +95,11 @@ bool Shader::linesFromFile(string filepath, bool include_part, vector<string>* r
   bool in_include_part = false;
 
   while(fgets(line, 255, file)) {
-    stringstream ss(line);
-    string first;
+    std::stringstream ss(line);
+    std::string first;
     ss >> first;
     if(first == "#include") {
-      string filename;
+      std::string filename;
       ss >> filename;
 
       if((int) filename.size() > 0 && filename[0] == '\"' && filename[(int) filename.size() - 1] == '\"') {

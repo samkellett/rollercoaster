@@ -24,7 +24,7 @@ public:
   Texture();
   
   void createFromData(BYTE *data, int width, int height, int bpp, GLenum format, bool mipmaps = false);
-  bool load(string path, bool mipmaps = false);
+  bool load(std::string path, bool mipmaps = false);
   void bind(int texture = 0);
 
   void setFiltering(int magnification, int minification);
@@ -52,7 +52,7 @@ private:
   int minification_;
   int magnification_;
 
-  string path_;
+  std::string path_;
 };
 
 #endif

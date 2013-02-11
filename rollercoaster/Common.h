@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstring>
+#include <string>
 #include <vector>
 #include <sstream>
 #include <queue>
@@ -15,7 +15,5 @@
 
 #include "include/glm/gtc/type_ptr.hpp"
 #include "include/glm/gtc/matrix_transform.hpp"
-
-using namespace std;
 
 #endif

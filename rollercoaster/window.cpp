@@ -137,7 +137,7 @@ HDC Window::init(HINSTANCE hinstance)
 }
 
 // Create the game window
-void Window::create(string title) 
+void Window::create(std::string title) 
 {
   WNDCLASSEX wcex;
   memset(&wcex, 0, sizeof(WNDCLASSEX));

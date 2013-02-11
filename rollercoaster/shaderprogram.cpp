@@ -80,13 +80,13 @@ UINT ShaderProgram::id()
 
 // Setting floats
 
-void ShaderProgram::setUniform(string name, float* values, int count)
+void ShaderProgram::setUniform(std::string name, float* values, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform1fv(location, count, values);
 }
 
-void ShaderProgram::setUniform(string name, const float value)
+void ShaderProgram::setUniform(std::string name, const float value)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform1fv(location, 1, &value);
@@ -94,37 +94,37 @@ void ShaderProgram::setUniform(string name, const float value)
 
 // Setting vectors
 
-void ShaderProgram::setUniform(string name, glm::vec2* vectors, int count)
+void ShaderProgram::setUniform(std::string name, glm::vec2* vectors, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform2fv(location, count, (GLfloat *) vectors);
 }
 
-void ShaderProgram::setUniform(string name, const glm::vec2 vector)
+void ShaderProgram::setUniform(std::string name, const glm::vec2 vector)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform2fv(location, 1, (GLfloat *) &vector);
 }
 
-void ShaderProgram::setUniform(string name, glm::vec3* vectors, int count)
+void ShaderProgram::setUniform(std::string name, glm::vec3* vectors, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform3fv(location, count, (GLfloat *) vectors);
 }
 
-void ShaderProgram::setUniform(string name, const glm::vec3 vector)
+void ShaderProgram::setUniform(std::string name, const glm::vec3 vector)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform3fv(location, 1, (GLfloat *) &vector);
 }
 
-void ShaderProgram::setUniform(string name, glm::vec4* vectors, int count)
+void ShaderProgram::setUniform(std::string name, glm::vec4* vectors, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform4fv(location, count, (GLfloat *) vectors);
 }
 
-void ShaderProgram::setUniform(string name, const glm::vec4 vector)
+void ShaderProgram::setUniform(std::string name, const glm::vec4 vector)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform4fv(location, 1, (GLfloat *) &vector);
@@ -132,13 +132,13 @@ void ShaderProgram::setUniform(string name, const glm::vec4 vector)
 
 // Setting 3x3 matrices
 
-void ShaderProgram::setUniform(string name, glm::mat3* matrices, int count)
+void ShaderProgram::setUniform(std::string name, glm::mat3* matrices, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniformMatrix3fv(location, count, false, (GLfloat *) matrices);
 }
 
-void ShaderProgram::setUniform(string name, const glm::mat3 matrix)
+void ShaderProgram::setUniform(std::string name, const glm::mat3 matrix)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniformMatrix3fv(location, 1, false, (GLfloat *) &matrix);
@@ -146,13 +146,13 @@ void ShaderProgram::setUniform(string name, const glm::mat3 matrix)
 
 // Setting 4x4 matrices
 
-void ShaderProgram::setUniform(string name, glm::mat4 *matrices, int count)
+void ShaderProgram::setUniform(std::string name, glm::mat4 *matrices, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniformMatrix4fv(location, count, false, (GLfloat *) matrices);
 }
 
-void ShaderProgram::setUniform(string name, const glm::mat4 matrix)
+void ShaderProgram::setUniform(std::string name, const glm::mat4 matrix)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniformMatrix4fv(location, 1, false, (GLfloat *) &matrix);
@@ -160,13 +160,13 @@ void ShaderProgram::setUniform(string name, const glm::mat4 matrix)
 
 // Setting integers
 
-void ShaderProgram::setUniform(string name, int* values, int count)
+void ShaderProgram::setUniform(std::string name, int* values, int count)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform1iv(location, count, values);
 }
 
-void ShaderProgram::setUniform(string name, const int value)
+void ShaderProgram::setUniform(std::string name, const int value)
 {
   int location = glGetUniformLocation(id_, name.c_str());
   glUniform1i(location, value);

@@ -10,7 +10,7 @@
 class Plane
 {
 public:
-  void create(string directory, string filename, float width, float height, float texture_repeat);
+  void create(std::string directory, std::string filename, float width, float height, float texture_repeat);
   void render();
   void release();
 
@@ -18,8 +18,8 @@ private:
   UINT vao_;
   VBO vbo_;
   Texture texture_;
-  string directory_;
-  string filename_;
+  std::string directory_;
+  std::string filename_;
   float width_;
   float height_;
 };

@@ -51,7 +51,7 @@ private:
 
   Skybox *skybox_;
   Camera *camera_;
-  vector<ShaderProgram *> *shader_programs_;
+  std::vector<ShaderProgram *> *shader_programs_;
   Plane *terrain_;
   FreeTypeFont *font_;
   ObjModel *barrel_;

@@ -6,7 +6,7 @@
 #include <math.h>
 
 // Create a unit sphere 
-void Sphere::create(string directory, string filename, int slices, int stacks)
+void Sphere::create(std::string directory, std::string filename, int slices, int stacks)
 {
   // check if filename passed in -- if so, load texture
   texture_.load(directory + filename);

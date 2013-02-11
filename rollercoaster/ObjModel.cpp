@@ -7,14 +7,14 @@ ObjModel::ObjModel() :
 
 /*-----------------------------------------------
   Name:    split
-  Params:  s - string to split
-       t - string to split according to
-  Result:  Splits string according to some substring
+  Params:  s - std::string to split
+       t - std::string to split according to
+  Result:  Splits std::string according to some substd::string
        and returns it as a vector.
 /*---------------------------------------------*/
-vector<string> split(string s, string t)
+std::vector<std::string> split(std::string s, std::string t)
 {
-  vector<string> res;
+  std::vector<std::string> res;
   while(true) {
     int pos = s.find(t);
     if(pos == -1){
@@ -35,10 +35,10 @@ vector<string> split(string s, string t)
   Params:  sFilePath - file path
   Result:  Returns path of a directory from file path.
 /*---------------------------------------------*/
-string getDirectoryPath(string path)
+std::string getDirectoryPath(std::string path)
 {
   // Get directory path
-  string directory = "";
+  std::string directory = "";
   for (int i = (int) path.size() - 1; i >= 0; --i) {
     if(path[i] == '\\' || path[i] == '/') {
       directory = path.substr(0, i + 1);
@@ -55,7 +55,7 @@ string getDirectoryPath(string path)
        sMtlFileName - relative path material file
   Result:  Loads obj model.
 /*---------------------------------------------*/
-bool ObjModel::load(string filename, string material)
+bool ObjModel::load(std::string filename, std::string material)
 {
   FILE* file;
   fopen_s(&file, filename.c_str(), "rt");
@@ -70,9 +70,9 @@ bool ObjModel::load(string filename, string material)
 
   char line[255];
 
-  vector<glm::vec3> vertices;
-  vector<glm::vec2> texture_coords;
-  vector<glm::vec3> normals;
+  std::vector<glm::vec3> vertices;
+  std::vector<glm::vec2> texture_coords;
+  std::vector<glm::vec3> normals;
 
   faces_ = 0;
 
@@ -86,8 +86,8 @@ bool ObjModel::load(string filename, string material)
     }
 
     // Now we're going to process line
-    stringstream ss(line);
-    string type;
+    std::stringstream ss(line);
+    std::string type;
     ss >> type;
     
     if(type == "#") { // If it's a comment, skip it
@@ -118,11 +118,11 @@ bool ObjModel::load(string filename, string material)
       normals.push_back(new_normal);
       attributes_ |= 4;
     } else if(type == "f") { // Face definition
-      string face_data;
+      std::string face_data;
       // This will run for as many vertex definitions as the face has
       // (for triangle, it's 3)
       while(ss >> face_data) {
-        vector<string> data = split(face_data, "/");
+        std::vector<std::string> data = split(face_data, "/");
         int vertex_index = -1;
         int texture_index = -1;
         int normal_index = -1;
@@ -140,7 +140,7 @@ bool ObjModel::load(string filename, string material)
         if(attributes_ & 2 && !error) {
           if((int) data.size() >= 1) {
             // Just a check whether face format isn't f v//vn
-            // In that case, data[1] is empty string
+            // In that case, data[1] is empty std::string
             if((int) data[1].size() > 0) {
               sscanf_s(data[1].c_str(), "%d", &texture_index);
             } else {
@@ -277,7 +277,7 @@ void ObjModel::render()
   Result:  Loads material (currently only ambient
        texture).
 /*---------------------------------------------*/
-bool ObjModel::loadMaterial(string material)
+bool ObjModel::loadMaterial(std::string material)
 {
   // For now, we'll just look for ambient texture, i.e. line that begins with map_Ka
   FILE* file;
@@ -289,15 +289,15 @@ bool ObjModel::loadMaterial(string material)
 
   char lines[255];
   while(fgets(lines, 255, file)) {
-    stringstream ss(lines);
-    string type;
+    std::stringstream ss(lines);
+    std::string type;
     ss >> type;
     if(type == "map_Ka") {
-      string line = lines;
+      std::string line = lines;
 
       // Take the rest of line as texture name, remove newline character from end
       int from = line.find("map_Ka") + 6 + 1;
-      string texture = line.substr(from, (int) line.size() - from - 1);
+      std::string texture = line.substr(from, (int) line.size() - from - 1);
 
       // Texture should be in the same directory as material
       texture_.load(getDirectoryPath(material) + texture, true);

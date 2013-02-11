@@ -10,7 +10,7 @@ class ObjModel
 {
 public:
   ObjModel();
-  bool load(string file, string material);
+  bool load(std::string file, std::string material);
   void render();
   void release();
 
@@ -24,7 +24,7 @@ private:
   UINT vao_;
   Texture texture_;
 
-  bool loadMaterial(string filename);
+  bool loadMaterial(std::string filename);
 
 };
 

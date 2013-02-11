@@ -9,10 +9,10 @@ class Shader
 public:
   Shader();
 
-  bool loadShader(string file, int type);
+  bool loadShader(std::string file, int type);
   void deleteShader();
 
-  bool linesFromFile(string file, bool include_part, vector<string> *result);
+  bool linesFromFile(std::string file, bool include_part, std::vector<std::string> *result);
 
   bool loaded();
   UINT shaderID();

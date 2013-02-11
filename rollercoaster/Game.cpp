@@ -76,7 +76,7 @@ void Game::init()
   /// Create objects
   camera_ = new Camera;
   skybox_ = new Skybox;
-  shader_programs_ = new vector<ShaderProgram *>;
+  shader_programs_ = new std::vector<ShaderProgram *>;
   terrain_ = new Plane;
   font_ = new FreeTypeFont;
   barrel_ = new ObjModel;
@@ -93,8 +93,8 @@ void Game::init()
   camera_->setPerspectiveMatrix(45.0f, (float) width / (float) height, 0.5f, 5000.0f);
 
   // Load shaders
-  vector<Shader> shaders;
-  vector<string> shader_filenames;
+  std::vector<Shader> shaders;
+  std::vector<std::string> shader_filenames;
 
   shader_filenames.push_back("perVertexLighting.vert");
   shader_filenames.push_back("perVertexLighting.frag");
@@ -102,7 +102,7 @@ void Game::init()
   shader_filenames.push_back("font2D.frag");
 
   for (int i = 0; i < (int) shader_filenames.size(); ++i) {
-    string ext = shader_filenames[i].substr((int) shader_filenames[i].size() - 4, 4);
+    std::string ext = shader_filenames[i].substr((int) shader_filenames[i].size() - 4, 4);
     int shader_type = ext == "vert" ? GL_VERTEX_SHADER : (ext == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
 
     Shader shader;

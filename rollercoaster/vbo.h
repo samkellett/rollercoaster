@@ -38,7 +38,7 @@ private:
   UINT buffer_;
   int size_;
   int type_;
-  vector<BYTE> data_;
+  std::vector<BYTE> data_;
 
   bool uploaded_;
 };
