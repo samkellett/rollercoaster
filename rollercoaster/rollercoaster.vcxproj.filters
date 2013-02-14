@@ -7,6 +7,9 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{8eaa2596-7ef2-40ab-a17a-c4c37dc4da44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{09e5fe7b-68ca-4376-a403-11ca25938704}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h">
@@ -52,6 +55,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="catmullrom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,5 +107,22 @@
     <ClCompile Include="shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="catmullrom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\shaders\font2D.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\ortho2D.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\perVertexLighting.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\perVertexLighting.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

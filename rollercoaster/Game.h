@@ -14,6 +14,7 @@ class Timer;
 class Window;
 class ObjModel;
 class Sphere;
+class CatmullRom;
 
 class Game 
 {
@@ -57,6 +58,7 @@ private:
   ObjModel *barrel_;
   ObjModel *horse_;
   Sphere *sphere_;
+  CatmullRom *catmull_;
 };
 
 #endif

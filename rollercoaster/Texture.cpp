@@ -3,7 +3,6 @@
 #include "common.h"
 
 #include "include\freeimage\FreeImage.h"
-#pragma comment(lib, "lib/FreeImage.lib")
 
 Texture::Texture() :
   mipmaps_(false)

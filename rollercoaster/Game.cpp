@@ -21,9 +21,6 @@ Source code drawn from a number of sources and examples, including contributions
 
 #include "game.h"
 
-#include "include/gl/glew.h"
-#include <gl/gl.h>
-
 // setup includes
 #include "timer.h"
 #include "window.h"
@@ -38,6 +35,7 @@ Source code drawn from a number of sources and examples, including contributions
 #include "objmodel.h"
 #include "sphere.h"
 #include "matrixstack.h"
+#include "catmullrom.h"
 
 
 Game::Game() : 
@@ -82,6 +80,7 @@ void Game::init()
   barrel_ = new ObjModel;
   horse_ = new ObjModel;
   sphere_ = new Sphere;
+  catmull_ = new CatmullRom;
 
   RECT dimensions = window_.dimensions();
 
@@ -91,6 +90,7 @@ void Game::init()
   // Set the orthographic and perspective projection matrices based on the image size
   camera_->setOrthographicMatrix(width, height); 
   camera_->setPerspectiveMatrix(45.0f, (float) width / (float) height, 0.5f, 5000.0f);
+
 
   // Load shaders
   std::vector<Shader> shaders;
@@ -146,6 +146,14 @@ void Game::init()
 
   // Texture downloaded from http://www.psionicgames.com/?page_id=26 on 24 Jan 2013
   sphere_->create("resources\\textures\\", "dirtpile01.jpg", 25, 25);
+
+  catmull_->createPathGeometry(
+    glm::vec3(-500.0f, 10.0f, -200.0f),
+    glm::vec3(0.0f, 10.0f, -200.0f),
+    glm::vec3(0.0f, 10.0f, 200.0f),
+    glm::vec3(-500.0f, 10.0f, 200.0f)
+  );
+
 
   // Set the texture sampler in the fragment shader
   main->setUniform("gSampler", 0);
@@ -250,6 +258,14 @@ void Game::render()
     sphere_->render();
   modelview.pop();
 
+  modelview.push();
+    main->setUniform("bUseTexture", false);
+    main->setUniform("matrices.modelViewMatrix", modelview.top());
+    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
+
+    catmull_->render();
+  modelview.pop();
+
   renderFPS();
 
   // Swap buffers to show the rendered image
@@ -262,6 +278,12 @@ void Game::update()
 {
   // Update the camera using the amount of time that has elapsed to avoid framerate dependent motion
   camera_->update(dt_);
+
+  static float time = 0.0f;
+  time += 0.0005f * (float) dt_;
+  if (time > 1.0f) {
+    time = 0.0f;
+  }
 }
 
 

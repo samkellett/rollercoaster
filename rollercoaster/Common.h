@@ -4,16 +4,19 @@
 #include <ctime>
 #include <windows.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <algorithm>
-#include <cmath>
 #include <string>
 #include <vector>
 #include <sstream>
-#include <queue>
-#include <map>
-#include <set>
 
 #include "include/glm/gtc/type_ptr.hpp"
 #include "include/glm/gtc/matrix_transform.hpp"
+
+#include "include/gl/glew.h"
+#include <gl/gl.h>
+#include <gl/glu.h>
 
 #endif

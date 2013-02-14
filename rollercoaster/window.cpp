@@ -249,7 +249,6 @@ void Window::deinit()
 {
   if (hrc_) {
     wglMakeCurrent(NULL, NULL);
-    wglDeleteContext(hrc_);
   }
 
   if (hdc_) {

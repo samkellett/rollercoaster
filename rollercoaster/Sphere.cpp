@@ -2,9 +2,6 @@
 
 #include "common.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 // Create a unit sphere 
 void Sphere::create(std::string directory, std::string filename, int slices, int stacks)
 {

@@ -8,6 +8,9 @@ uniform vec4 vColour;
 
 void main()
 {
-	vec4 vTexColour = texture2D(gSampler, vTexCoord);	// Get the texel colour from the image
-	vOutputColour = vec4(vTexColour.r) * vColour;			// The texel colour is a grayscale value -- apply to RGBA and combine with vColor
+	// Get the texel colour from the image
+	vec4 vTexColour = texture(gSampler, vTexCoord);
+
+	// The texel colour is a grayscale value -- apply to RGBA and combine with vColor
+	vOutputColour = vec4(vTexColour.r) * vColour;
 }

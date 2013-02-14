@@ -6,8 +6,6 @@
 #include "shader.h"
 #include "shaderprogram.h"
 
-#pragma comment(lib, "lib/freetype2410.lib")
-
 FreeTypeFont::FreeTypeFont() :
   loaded_(false)
 {

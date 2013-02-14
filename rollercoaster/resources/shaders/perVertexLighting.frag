@@ -1,23 +1,30 @@
 #version 330
 
-in vec3 vColour;			// Interpolated colour using colour calculated in the vertex shader
-in vec2 vTexCoord;			// Interpolated texture coordinate using texture coordinate from the vertex shader
+// Interpolated colour using colour calculated in the vertex shader
+in vec3 vColour;
 
-out vec4 vOutputColour;		// The output colour
+// Interpolated texture coordinate using texture coordinate from the vertex shader
+in vec2 vTexCoord;
 
-uniform sampler2D gSampler;  // The texture sampler
-uniform bool bUseTexture;    // A flag indicating if texture-mapping should be applied
+// The output colour
+out vec4 vOutputColour;
+
+// The texture sampler
+uniform sampler2D gSampler;
+
+// A flag indicating if texture-mapping should be applied
+uniform bool bUseTexture;
 
 void main()
 {
 	// Get the texel colour from the texture sampler
-	vec4 vTexColour = texture2D(gSampler, vTexCoord);	
+	vec4 vTexColour = texture(gSampler, vTexCoord);	
 
-	if (bUseTexture)
-		vOutputColour = vTexColour*vec4(vColour, 1.0f);	// Combine object colour and texture 
-	else
-		vOutputColour = vec4(vColour, 1.0f);	// Just use the colour instead
-
-	
-	
+	if (bUseTexture) {
+		// Combine object colour and texture
+		vOutputColour = vTexColour * vec4(vColour, 1.0f);	 
+	} else {
+		// Just use the colour instead
+		vOutputColour = vec4(vColour, 1.0f);
+	}
 }
