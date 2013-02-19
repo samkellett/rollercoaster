@@ -30,12 +30,11 @@ Source code drawn from a number of sources and examples, including contributions
 #include "skybox.h"
 #include "plane.h"
 #include "shader.h"
-#include "shaderprogram.h"
 #include "freetypefont.h"
 #include "objmodel.h"
 #include "sphere.h"
 #include "matrixstack.h"
-#include "catmullrom.h"
+#include "builder.h"
 
 
 Game::Game() : 
@@ -74,13 +73,13 @@ void Game::init()
   /// Create objects
   camera_ = new Camera;
   skybox_ = new Skybox;
-  shader_programs_ = new std::vector<ShaderProgram *>;
+  shader_programs_ = new ShaderList;
   terrain_ = new Plane;
   font_ = new FreeTypeFont;
   barrel_ = new ObjModel;
   horse_ = new ObjModel;
   sphere_ = new Sphere;
-  catmull_ = new CatmullRom;
+  builder_ = new Builder;
 
   RECT dimensions = window_.dimensions();
 
@@ -147,17 +146,8 @@ void Game::init()
   // Texture downloaded from http://www.psionicgames.com/?page_id=26 on 24 Jan 2013
   sphere_->create("resources\\textures\\", "dirtpile01.jpg", 25, 25);
 
-  catmull_->createPathGeometry(
-    glm::vec3(-500.0f, 10.0f, -200.0f),
-    glm::vec3(0.0f, 10.0f, -200.0f),
-    glm::vec3(0.0f, 10.0f, 200.0f),
-    glm::vec3(-500.0f, 10.0f, 200.0f)
-  );
-
-
   // Set the texture sampler in the fragment shader
   main->setUniform("gSampler", 0);
-
 }
 
 void Game::render() 
@@ -263,7 +253,7 @@ void Game::render()
     main->setUniform("matrices.modelViewMatrix", modelview.top());
     main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
 
-    catmull_->render();
+    builder_->render();
   modelview.pop();
 
   renderFPS();
@@ -272,21 +262,12 @@ void Game::render()
   SwapBuffers(window_.hdc());    
 }
 
-
-
 void Game::update() 
 {
   // Update the camera using the amount of time that has elapsed to avoid framerate dependent motion
   camera_->update(dt_);
-
-  static float time = 0.0f;
-  time += 0.0005f * (float) dt_;
-  if (time > 1.0f) {
-    time = 0.0f;
-  }
+  builder_->update(dt_);
 }
-
-
 
 void Game::renderFPS()
 {
@@ -444,4 +425,19 @@ Game& Game::instance()
 void Game::setHInstance(HINSTANCE hinstance) 
 {
   hinstance_ = hinstance;
+}
+
+Camera *Game::camera()
+{
+  return camera_;
+}
+
+ShaderList *Game::shaderPrograms()
+{
+  return shader_programs_;
+}
+
+ShaderProgram *Game::shaderPrograms(unsigned int index)
+{
+  return (*shader_programs_)[index];
 }

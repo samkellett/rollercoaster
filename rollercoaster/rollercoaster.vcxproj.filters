@@ -60,6 +60,9 @@
     <ClInclude Include="catmullrom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -108,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="catmullrom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

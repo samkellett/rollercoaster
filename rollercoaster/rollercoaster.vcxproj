@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="builder.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="catmullrom.h" />
     <ClInclude Include="common.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="vbo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="builder.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="catmullrom.cpp" />
     <ClCompile Include="freetypefont.cpp" />

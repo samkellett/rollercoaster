@@ -2,19 +2,19 @@
 #define GAME_H
 
 #include "common.h"
+#include "shaderprogram.h"
 
 // Classes used in game
 class Camera;
 class Skybox;
 class Shader;
-class ShaderProgram;
 class Plane;
 class FreeTypeFont;
 class Timer;
 class Window;
 class ObjModel;
 class Sphere;
-class CatmullRom;
+class Builder;
 
 class Game 
 {
@@ -25,6 +25,11 @@ public:
 
   static Game& instance();
   ~Game();
+
+  Camera *camera();
+
+  ShaderList *shaderPrograms();
+  ShaderProgram *shaderPrograms(unsigned int index);
 
   WPARAM exec();
 
@@ -52,13 +57,13 @@ private:
 
   Skybox *skybox_;
   Camera *camera_;
-  std::vector<ShaderProgram *> *shader_programs_;
+  ShaderList *shader_programs_;
   Plane *terrain_;
   FreeTypeFont *font_;
   ObjModel *barrel_;
   ObjModel *horse_;
   Sphere *sphere_;
-  CatmullRom *catmull_;
+  Builder *builder_;
 };
 
 #endif

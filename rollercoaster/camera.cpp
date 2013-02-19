@@ -111,19 +111,19 @@ void Camera::update(double dt)
 // Update the camera to respond to key presses for translation
 void Camera::translateByKeyboard(double dt)
 {
-  if(GetKeyState(VK_UP) & 0x80) {    
+  if(GetKeyState(87) & 0x80) {    
     advance(1.0 * dt);  
   }
 
-  if(GetKeyState(VK_DOWN) & 0x80) {  
+  if(GetKeyState(83) & 0x80) {  
     advance(-1.0 * dt);    
   }
 
-  if(GetKeyState(VK_LEFT) & 0x80) {  
+  if(GetKeyState(65) & 0x80) {  
     strafe(-1.0 * dt);
   }
 
-  if(GetKeyState(VK_RIGHT) & 0x80 ) {      
+  if(GetKeyState(68) & 0x80 ) {      
     strafe(1.0 * dt);
   }  
 }
