@@ -8,6 +8,10 @@
 Builder::Builder() :
   main_(NULL)
 {
+  points_.push_back(glm::vec3(-500, 10, -200));
+  points_.push_back(glm::vec3(0, 10, -200));
+  points_.push_back(glm::vec3(0, 10, 200));
+  points_.push_back(glm::vec3(-500, 10, 200));
 }
 
 Builder::~Builder() 
