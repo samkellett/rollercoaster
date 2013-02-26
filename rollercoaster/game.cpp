@@ -1,7 +1,7 @@
 /* 
-OpenGL Template for INM376 / IN3005
-City University London, School of Informatics
-Source code drawn from a number of sources and examples, including contributions from
+ OpenGL Template for INM376 / IN3005
+ City University London, School of Informatics
+ Source code drawn from a number of sources and examples, including contributions from
  - Drs. Greg Slabaugh, Chris Child, Dean Mohamedally
  - Ben Humphrey (gametutorials.com), Michal Bubner (mbsoftworks.sk), Christophe Riccio (glm.g-truc.net)
  - Christy Quinn, Sam Kellett
@@ -18,50 +18,64 @@ Source code drawn from a number of sources and examples, including contributions
  Dr. Greg Slabaugh (gregory.slabaugh.1@city.ac.uk) 
 */
 
-
 #include "game.h"
 
-// setup includes
+#include "matrixstack.h"
+#include "shader.h"
+#include "shaderprogram.h"
 #include "timer.h"
 #include "window.h"
 
-// game includes
+// GameObject's
 #include "camera.h"
 #include "skybox.h"
-#include "plane.h"
-#include "shader.h"
+#include "terrain.h"
+
+// tbc
 #include "freetypefont.h"
 #include "objmodel.h"
 #include "sphere.h"
-#include "matrixstack.h"
 #include "builder.h"
 
-
 Game::Game() : 
-  skybox_(NULL), camera_(NULL), terrain_(NULL), font_(NULL), barrel_(NULL), horse_(NULL), sphere_(NULL),
-  window_(Window::instance()), timer_(NULL), dt_(0.0), fps_(0)
+  font_(NULL), barrel_(NULL), horse_(NULL), sphere_(NULL),
+  camera_(NULL), timer_(NULL), dt_(0.0), fps_(0)
 {
 }
 
 Game::~Game() 
 { 
-  // game objects
-  delete camera_;
-  delete skybox_;
-  delete terrain_;
   delete font_;
   delete barrel_;
   delete horse_;
   delete sphere_;
 
-  while(!shader_programs_->empty()) {
-    delete shader_programs_->back();
-    shader_programs_->pop_back();
+  while (!objects_.empty()) {
+    delete objects_.back();
+    objects_.pop_back();
   }
-  delete shader_programs_;
 
-  // setup objects
+  typedef std::hash_map<std::string, ShaderProgram *>::iterator iterator;
+  for (iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {
+    delete program->second;
+  }
+
+  delete camera_;
   delete timer_;
+}
+
+void Game::registerObjects()
+{
+  camera_ = new Camera;
+
+  objects_.push_back(new Skybox);
+  objects_.push_back(new Terrain);
+
+  font_ = new FreeTypeFont;
+  barrel_ = new ObjModel;
+  horse_ = new ObjModel;
+  sphere_ = new Sphere;
+  builder_ = new Builder;
 }
 
 void Game::init() 
@@ -70,26 +84,15 @@ void Game::init()
   glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
   glClearDepth(1.0f);
 
-  /// Create objects
-  camera_ = new Camera;
-  skybox_ = new Skybox;
-  shader_programs_ = new ShaderList;
-  terrain_ = new Plane;
-  font_ = new FreeTypeFont;
-  barrel_ = new ObjModel;
-  horse_ = new ObjModel;
-  sphere_ = new Sphere;
-  builder_ = new Builder;
+  registerObjects();
 
   RECT dimensions = window_.dimensions();
-
   int width = dimensions.right - dimensions.left;
   int height = dimensions.bottom - dimensions.top;
 
   // Set the orthographic and perspective projection matrices based on the image size
   camera_->setOrthographicMatrix(width, height); 
   camera_->setPerspectiveMatrix(45.0f, (float) width / (float) height, 0.5f, 5000.0f);
-
 
   // Load shaders
   std::vector<Shader> shaders;
@@ -105,52 +108,42 @@ void Game::init()
     int shader_type = ext == "vert" ? GL_VERTEX_SHADER : (ext == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
 
     Shader shader;
-    shader.loadShader("resources\\shaders\\" + shader_filenames[i], shader_type);
+    shader.loadShader("resources/shaders/" + shader_filenames[i], shader_type);
     shaders.push_back(shader);
   }
 
   // Create the main shader program
-  ShaderProgram *main = new ShaderProgram;
-  main->create();
-  main->addShader(&shaders[0]);
-  main->addShader(&shaders[1]);
-  main->link();
-  shader_programs_->push_back(main);
+  shader_programs_["main"] = new ShaderProgram;
+  shader_programs_["main"]->create();
+  shader_programs_["main"]->addShader(&shaders[0]);
+  shader_programs_["main"]->addShader(&shaders[1]);
+  shader_programs_["main"]->link();
   
   // Create a shader program for fonts
-  ShaderProgram *fonts = new ShaderProgram;
-  fonts->create();
-  fonts->addShader(&shaders[2]);
-  fonts->addShader(&shaders[3]);
-  fonts->link();
-  shader_programs_->push_back(fonts);
-
-  // Create the skybox
-  // Skybox downloaded from http://www.akimbo.in/forum/viewtopic.php?f=10&t=9
-  skybox_->create("resources\\skyboxes\\jajdarkland1\\", "jajdarkland1_ft.jpg", "jajdarkland1_bk.jpg", "jajdarkland1_lf.jpg", "jajdarkland1_rt.jpg", "jajdarkland1_up.jpg", "jajdarkland1_dn.jpg", 2500.0f);
+  shader_programs_["fonts"] = new ShaderProgram;
+  shader_programs_["fonts"]->create();
+  shader_programs_["fonts"]->addShader(&shaders[2]);
+  shader_programs_["fonts"]->addShader(&shaders[3]);
+  shader_programs_["fonts"]->link();
   
-  // Create the planar terrain
-  // Texture downloaded from http://www.psionicgames.com/?page_id=26 on 24 Jan 2013
-  terrain_->create("resources\\textures\\", "grassfloor01.jpg", 2000.0f, 2000.0f, 50.0f); 
-
   font_->loadSystemFont("arial.ttf", 32);
-  font_->setShaderProgram(fonts);
+  font_->setShaderProgram(shader_programs_["fonts"]);
 
   // Load some meshes in OBJ format
   // Downloaded from http://www.psionicgames.com/?page_id=24 on 24 Jan 2013
-  barrel_->load("resources\\models\\Barrel\\Barrel02.obj", "Barrel02.mtl");
+  barrel_->load("resources/models/Barrel/Barrel02.obj", "Barrel02.mtl");
 
   // Downloaded from http://opengameart.org/content/horse-lowpoly on 24 Jan 2013
-  horse_->load("resources\\models\\Horse\\Horse2.obj", "Horse2.mtl");
+  horse_->load("resources/models/Horse/Horse2.obj", "Horse2.mtl");
 
   // Texture downloaded from http://www.psionicgames.com/?page_id=26 on 24 Jan 2013
-  sphere_->create("resources\\textures\\", "dirtpile01.jpg", 25, 25);
+  sphere_->create("resources/textures/", "dirtpile01.jpg", 25, 25);
 
   // Set the texture sampler in the fragment shader
-  main->setUniform("gSampler", 0);
+  shader_programs_["main"]->setUniform("gSampler", 0);
 }
 
-void Game::render() 
+void Game::loop() 
 {  
   // Clear the buffers and enable depth testing (z-buffering)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -162,11 +155,12 @@ void Game::render()
   modelview.setIdentity();
 
   // Use the main shader program 
-  ShaderProgram *main = (*shader_programs_)[0];
+  ShaderProgram *main = shader_programs_["main"];
   main->use();
   main->setUniform("bUseTexture", true);
 
   // Set the projection and modelview matrix based on the current camera location  
+  camera_->update(dt_);
   main->setUniform("matrices.projMatrix", camera_->perspectiveMatrix());
   modelview.lookAt(camera_->position(), camera_->view(), camera_->upVector());
 
@@ -186,32 +180,13 @@ void Game::render()
   main->setUniform("material1.Ms", glm::vec3(0.0f)); // Specular material reflectance
   main->setUniform("material1.shininess", 15.0f); // Shininess material property
 
-  // Render the skybox and terrain with full ambient light 
-  modelview.push();
-    // Translate the modelview matrix to the camera eye point so skybox stays centred around camera
-    glm::vec3 eye = camera_->position();
-    modelview.translate(eye);
-
-    main->setUniform("matrices.modelViewMatrix", modelview.top());
-    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
-
-    skybox_->render();
-  modelview.pop();
+  for (unsigned int i = 0; i < objects_.size(); ++i) {
+    modelview.push();
+      objects_[i]->update(modelview, dt_);
+      objects_[i]->render(modelview, shader_programs_[objects_[i]->program()]);
+    modelview.pop();
+  }
   
-  // Render the planar terrain
-  modelview.push();
-    main->setUniform("matrices.modelViewMatrix", modelview.top());
-    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
-    
-    terrain_->render();
-  modelview.pop();
-
-  // Turn on diffuse + specular materials
-  main->setUniform("material1.Ma", glm::vec3(0.5f)); // Ambient material reflectance
-  main->setUniform("material1.Md", glm::vec3(0.5f)); // Diffuse material reflectance
-  main->setUniform("material1.Ms", glm::vec3(1.0f)); // Specular material reflectance  
-
-
   // Render the horse 
   modelview.push();
     modelview.translate(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -262,19 +237,12 @@ void Game::render()
   SwapBuffers(window_.hdc());    
 }
 
-void Game::update() 
-{
-  // Update the camera using the amount of time that has elapsed to avoid framerate dependent motion
-  camera_->update(dt_);
-  builder_->update(dt_);
-}
-
 void Game::renderFPS()
 {
   static int count = 0;
   static double elapsed = 0.0f;
 
-  ShaderProgram *fonts = (*shader_programs_)[1];
+  ShaderProgram *fonts = shader_programs_["fonts"];
 
   RECT dimensions = window_.dimensions();
   int height = dimensions.bottom - dimensions.top;
@@ -333,29 +301,10 @@ WPARAM Game::exec()
 
       TranslateMessage(&msg);  
       DispatchMessage(&msg);
-    } else if (active_) {
-      /*
-      // Fixed timer
-      dt_ = timer_->elapsed();
-
-      if (dt_ > frame_duration) {
-        timer_->start();
-
-        update();
-        render();
-      }
-      */
-
-      // Variable timer
-      timer_->start();
-
-      update();
-      render();
-
-      dt_ = timer_->elapsed();
     } else {
-      // Do not consume processor power if application isn't active -- Sam: really?!
-      Sleep(200);
+      timer_->start();
+      loop();
+      dt_ = timer_->elapsed();
     }
   }
 
@@ -373,12 +322,7 @@ LRESULT Game::processEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_p
       switch(LOWORD(w_param)) {
         case WA_ACTIVE:
         case WA_CLICKACTIVE:
-          active_ = true;
           timer_->start();
-        break;
-
-        case WA_INACTIVE:
-          active_ = false;
         break;
       }
     break;
@@ -430,14 +374,4 @@ void Game::setHInstance(HINSTANCE hinstance)
 Camera *Game::camera()
 {
   return camera_;
-}
-
-ShaderList *Game::shaderPrograms()
-{
-  return shader_programs_;
-}
-
-ShaderProgram *Game::shaderPrograms(unsigned int index)
-{
-  return (*shader_programs_)[index];
 }

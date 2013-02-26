@@ -1,18 +1,17 @@
-#include "plane.h"
+#include "terrain.h"
 
 #include "common.h"
 
 // Create the plane, including its geometry, texture mapping, normal, and colour
-void Plane::create(std::string directory, std::string filename, float width, float height, float texture_repeat)
-{
-  width_ = width;
-  height_ = height;
-
+Terrain::Terrain() : GameObject(),
+  directory_("resources/textures/"),
+  filename_("grassfloor01.jpg"),
+  width_(2000.0f),
+  height_(2000.0f),
+  texture_repeat_(50.0f)
+{  
   // Load the texture
-  texture_.load(directory + filename, true);
-
-  directory_ = directory;
-  filename_ = filename;
+  texture_.load(directory_ + filename_, true);
 
   // Set parameters for texturing using sampler object
   texture_.setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR_MIPMAP);
@@ -41,9 +40,9 @@ void Plane::create(std::string directory, std::string filename, float width, flo
   // Texture coordinates
   glm::vec2 texture_coords[4] = {
     glm::vec2(0.0f, 0.0f), 
-    glm::vec2(texture_repeat, 0.0f), 
-    glm::vec2(0.0f, texture_repeat), 
-    glm::vec2(texture_repeat, texture_repeat)
+    glm::vec2(texture_repeat_, 0.0f), 
+    glm::vec2(0.0f, texture_repeat_), 
+    glm::vec2(texture_repeat_, texture_repeat_)
   };
 
   // Plane normal
@@ -75,18 +74,25 @@ void Plane::create(std::string directory, std::string filename, float width, flo
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*) (sizeof(glm::vec3) + sizeof(glm::vec2)));
 }
 
-// Render the plane as a triangle strip
-void Plane::render()
-{
-  glBindVertexArray(vao_);
-  texture_.bind();
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
 // Release resources
-void Plane::release()
+Terrain::~Terrain()
 {
   texture_.release();
   glDeleteVertexArrays(1, &vao_);
   vbo_.release();
+}
+
+void Terrain::update(glutil::MatrixStack &, double)
+{
+}
+
+// Render the plane as a triangle strip
+void Terrain::render(glutil::MatrixStack &modelview, ShaderProgram *program)
+{
+  program->setUniform("matrices.modelViewMatrix", modelview.top());
+  program->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
+
+  glBindVertexArray(vao_);
+  texture_.bind();
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

@@ -53,6 +53,4 @@ private:
   bool linked_; // Whether program was linked and is ready to use
 };
 
-typedef std::vector<ShaderProgram *> ShaderList;
-
 #endif

@@ -1,21 +1,27 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
+#include "gameobject.h"
+
 #include "texture.h"
 #include "vbo.h"
 
 // This is a class for creating and rendering a skybox
-class Skybox
+class Skybox : public GameObject
 {
 public:
-  void create(std::string directory, std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom, float size);
-  void render();
-  void release();
+  Skybox();
+  ~Skybox();
+  
+  void update(glutil::MatrixStack &modelview, double dt);
+  void render(glutil::MatrixStack &modelview, ShaderProgram *program);
 
 private:
   UINT vao_;
   VBO vbo_;
+
   Texture textures_[6];
+  float size_;
   std::string directory_;
 
   std::string front_;

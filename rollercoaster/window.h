@@ -9,12 +9,12 @@ LRESULT CALLBACK WinProc(HWND hWnd,UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 class Window {
 public:
-  static Window& instance();
-
   enum {
     WIDTH = 800,
     HEIGHT = 600,
   };
+
+  Window();
 
   HDC init(HINSTANCE hinstance);
   void deinit();
@@ -30,7 +30,6 @@ public:
   HWND hwnd() const;
 
 private:
-  Window();
   Window(const Window&);
   void operator=(const Window&);
 

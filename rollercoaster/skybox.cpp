@@ -1,28 +1,28 @@
-#include "common.h"
-
 #include "skybox.h"
+
+#include "common.h"
 #include "include/glm/gtc/matrix_transform.hpp"
 #include "include/glm/gtc/type_ptr.hpp"
 
-// Create a skybox of a given size with six textures
-void Skybox::create(std::string directory, std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom, float size)
+// Create the skybox
+// Skybox downloaded from http://www.akimbo.in/forum/viewtopic.php?f=10&t=9
+Skybox::Skybox() : GameObject(),
+  directory_("resources/skyboxes/jajdarkland1/"),
+  front_("jajdarkland1_ft.jpg"),
+  back_("jajdarkland1_bk.jpg"),
+  left_("jajdarkland1_lf.jpg"),
+  right_("jajdarkland1_rt.jpg"),
+  top_("jajdarkland1_up.jpg"),
+  bottom_("jajdarkland1_dn.jpg"),
+  size_(2500.0f)
 {
-  textures_[0].load(directory + front);
-  textures_[1].load(directory + back);
-  textures_[2].load(directory + left);
-  textures_[3].load(directory + right);
-  textures_[4].load(directory + top);
-  textures_[5].load(directory + bottom);
-
-  directory_ = directory;
-
-  front_ = front;
-  back_ = back;
-  left_ = left;
-  right_ = right;
-  top_ = top;
-  bottom_ = bottom;
-   
+  textures_[0].load(directory_ + front_);
+  textures_[1].load(directory_ + back_);
+  textures_[2].load(directory_ + left_);
+  textures_[3].load(directory_ + right_);
+  textures_[4].load(directory_ + top_);
+  textures_[5].load(directory_ + bottom_);
+ 
   for (int i = 0; i < 6; i++) {
     textures_[i].setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR);
     textures_[i].setSamplerParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -35,13 +35,14 @@ void Skybox::create(std::string directory, std::string front, std::string back, 
   vbo_.create();
   vbo_.bind();
 
+  float s = size_;
   glm::vec3 vertices[24] = {
-    glm::vec3(size, size, size), glm::vec3(size, -size, size), glm::vec3(-size, size, size), glm::vec3(-size, -size, size), // Front face
-    glm::vec3(-size, size, -size), glm::vec3(-size, -size, -size), glm::vec3(size, size, -size), glm::vec3(size, -size, -size), // Back face
-    glm::vec3(-size, size, size), glm::vec3(-size, -size, size), glm::vec3(-size, size, -size), glm::vec3(-size, -size, -size), // Left face
-    glm::vec3(size, size, -size), glm::vec3(size, -size, -size), glm::vec3(size, size, size), glm::vec3(size, -size, size), // Right face
-    glm::vec3(-size, size, -size), glm::vec3(size, size, -size), glm::vec3(-size, size, size), glm::vec3(size, size, size), // Top face
-    glm::vec3(size, -size, -size), glm::vec3(-size, -size, -size), glm::vec3(size, -size, size), glm::vec3(-size, -size, size), // Bottom face
+    glm::vec3(s, s, s), glm::vec3(s, -s, s), glm::vec3(-s, s, s), glm::vec3(-s, -s, s), // Front face
+    glm::vec3(-s, s, -s), glm::vec3(-s, -s, -s), glm::vec3(s, s, -s), glm::vec3(s, -s, -s), // Back face
+    glm::vec3(-s, s, s), glm::vec3(-s, -s, s), glm::vec3(-s, s, -s), glm::vec3(-s, -s, -s), // Left face
+    glm::vec3(s, s, -s), glm::vec3(s, -s, -s), glm::vec3(s, s, s), glm::vec3(s, -s, s), // Right face
+    glm::vec3(-s, s, -s), glm::vec3(s, s, -s), glm::vec3(-s, s, s), glm::vec3(s, s, s), // Top face
+    glm::vec3(s, -s, -s), glm::vec3(-s, -s, -s), glm::vec3(s, -s, s), glm::vec3(-s, -s, s), // Bottom face
   };
 
   glm::vec2 texture_coords[4] = {
@@ -83,9 +84,29 @@ void Skybox::create(std::string directory, std::string front, std::string back, 
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void *) (sizeof(glm::vec3) + sizeof(glm::vec2)));
 }
 
-// Render the skybox
-void Skybox::render()
+Skybox::~Skybox()
 {
+  for (int i = 0; i < 6; ++i) {
+    textures_[i].release();
+  }
+
+  glDeleteVertexArrays(1, &vao_);
+  vbo_.release();
+}
+
+void Skybox::update(glutil::MatrixStack &modelview, double)
+{
+  // Translate the modelview matrix to the camera eye point so skybox stays centred around camera
+  glm::vec3 eye = camera_->position();
+  modelview.translate(eye);
+}
+
+// Render the skybox
+void Skybox::render(glutil::MatrixStack &modelview, ShaderProgram *program)
+{
+  program->setUniform("matrices.modelViewMatrix", modelview.top());
+  program->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
+
   glDepthMask(0);
   glBindVertexArray(vao_);
 
@@ -95,15 +116,4 @@ void Skybox::render()
   }
 
   glDepthMask(1);
-}
-
-// Release the storage assocaited with the skybox
-void Skybox::release()
-{
-  for (int i = 0; i < 6; ++i) {
-    textures_[i].release();
-  }
-
-  glDeleteVertexArrays(1, &vao_);
-  vbo_.release();
 }

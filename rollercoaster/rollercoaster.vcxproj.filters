@@ -30,9 +30,6 @@
     <ClInclude Include="objmodel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="plane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,6 +60,12 @@
     <ClInclude Include="builder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gameobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -81,9 +84,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="objmodel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="skybox.cpp">
@@ -114,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

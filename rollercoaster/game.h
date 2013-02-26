@@ -2,16 +2,18 @@
 #define GAME_H
 
 #include "common.h"
-#include "shaderprogram.h"
+#include <hash_map>
 
-// Classes used in game
+#include "window.h"
+
 class Camera;
-class Skybox;
-class Shader;
-class Plane;
-class FreeTypeFont;
+class GameObject;
+class ShaderProgram;
 class Timer;
 class Window;
+
+// to be removed
+class FreeTypeFont;
 class ObjModel;
 class Sphere;
 class Builder;
@@ -28,9 +30,6 @@ public:
 
   Camera *camera();
 
-  ShaderList *shaderPrograms();
-  ShaderProgram *shaderPrograms(unsigned int index);
-
   WPARAM exec();
 
   void setHInstance(HINSTANCE hinstance);
@@ -42,23 +41,22 @@ private:
   void Game::operator=(const Game&);
 
   void init();
-  void update();
-  void render();
-
+  void registerObjects();
+  void loop();
+  
   void renderFPS();
 
-  Window &window_;
+  Window window_;
   HINSTANCE hinstance_;
 
   double dt_;
   int fps_;
   Timer *timer_;
-  bool active_;
 
-  Skybox *skybox_;
+  std::vector<GameObject *> objects_;
+  std::hash_map<std::string, ShaderProgram *> shader_programs_;
+
   Camera *camera_;
-  ShaderList *shader_programs_;
-  Plane *terrain_;
   FreeTypeFont *font_;
   ObjModel *barrel_;
   ObjModel *horse_;

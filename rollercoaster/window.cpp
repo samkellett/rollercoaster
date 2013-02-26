@@ -6,13 +6,6 @@
 
 #define SIMPLE_OPENGL_CLASS_NAME "simple_openGL_class_name"
 
-Window& Window::instance() 
-{
-  static Window instance;
-
-  return instance;
-}
-
 Window::Window() : 
   fullscreen_(false) 
 {
