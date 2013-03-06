@@ -99,13 +99,17 @@ void Camera::advance(double direction)
 }
 
 // Update the camera to respond to mouse motion for rotations and keyboard for translation
-void Camera::update(double dt)
+void Camera::update(glutil::MatrixStack &modelview, double dt)
 {
   glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
   strafe_vector_ = glm::normalize(cross);
 
   setViewByMouse();
   translateByKeyboard(dt);
+}
+
+void Camera::render(glutil::MatrixStack &modelview, ShaderProgram *program)
+{
 }
 
 // Update the camera to respond to key presses for translation

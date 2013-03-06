@@ -5,18 +5,15 @@
 #include <hash_map>
 
 #include "window.h"
+#include "freetypefont.h"
+#include "timer.h"
 
 class Camera;
 class GameObject;
 class ShaderProgram;
-class Timer;
-class Window;
 
-// to be removed
-class FreeTypeFont;
-class ObjModel;
-class Sphere;
-class Builder;
+typedef std::hash_map<std::string, ShaderProgram *> ShaderProgramMap;
+typedef std::vector<GameObject *> GameObjectList;
 
 class Game 
 {
@@ -51,17 +48,15 @@ private:
 
   double dt_;
   int fps_;
-  Timer *timer_;
-
-  std::vector<GameObject *> objects_;
-  std::hash_map<std::string, ShaderProgram *> shader_programs_;
+  double elapsed_;
+  int count_;
+  Timer timer_;
 
   Camera *camera_;
-  FreeTypeFont *font_;
-  ObjModel *barrel_;
-  ObjModel *horse_;
-  Sphere *sphere_;
-  Builder *builder_;
+  GameObjectList objects_;
+  ShaderProgramMap shader_programs_;
+
+  FreeTypeFont font_;
 };
 
 #endif

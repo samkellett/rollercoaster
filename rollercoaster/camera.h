@@ -1,10 +1,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "gameobject.h"
+
 #include "include/glm/gtc/type_ptr.hpp"
 #include "include/glm/gtc/matrix_transform.hpp"
 
-class Camera 
+class Camera : public GameObject 
 {
 public:
   // Constructor - sets default values for camera position, viewvector, upvector, and speed
@@ -49,14 +51,15 @@ public:
   // Advance the camera (move it forward or backward)
   void advance(double direction);
 
-  // Update the camera
-  void update(double dt);
-
   // Set the projection matrices
   void setPerspectiveMatrix(float fov, float aspect_ratio, float near, float far);
   void setOrthographicMatrix(int width, int height);
 
   glm::mat3 normalMatrix(const glm::mat4 &modelview);
+
+  // GameObject methods
+  void update(glutil::MatrixStack &modelview, double dt);
+  void render(glutil::MatrixStack &modelview, ShaderProgram *program);
 
 private:
   // The position of the camera's centre of projection

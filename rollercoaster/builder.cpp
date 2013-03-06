@@ -5,8 +5,7 @@
 #include "catmullrom.h"
 #include "vbo.h"
 
-Builder::Builder() :
-  main_(NULL)
+Builder::Builder()
 {
   points_.push_back(glm::vec3(-500, 10, -200));
   points_.push_back(glm::vec3(0, 10, -200));
@@ -26,14 +25,17 @@ void Builder::keyboardListener(double)
   }
 }
 
-void Builder::update(double dt)
+void Builder::update(glutil::MatrixStack &modelview, double dt)
 {
   createPath();
   keyboardListener(dt);
 }
 
-void Builder::render()
+void Builder::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
+  program->setUniform("bUseTexture", false);
+  program->setUniform("matrices.modelViewMatrix", modelview.top());
+
   glBindVertexArray(vao_);
 
   glLineWidth(5.0f);

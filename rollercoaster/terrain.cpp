@@ -90,7 +90,6 @@ void Terrain::update(glutil::MatrixStack &, double)
 void Terrain::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
   program->setUniform("matrices.modelViewMatrix", modelview.top());
-  program->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
 
   glBindVertexArray(vao_);
   texture_.bind();

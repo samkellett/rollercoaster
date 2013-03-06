@@ -1,6 +1,8 @@
 #include "skybox.h"
 
 #include "common.h"
+#include "camera.h"
+
 #include "include/glm/gtc/matrix_transform.hpp"
 #include "include/glm/gtc/type_ptr.hpp"
 
@@ -97,7 +99,7 @@ Skybox::~Skybox()
 void Skybox::update(glutil::MatrixStack &modelview, double)
 {
   // Translate the modelview matrix to the camera eye point so skybox stays centred around camera
-  glm::vec3 eye = camera_->position();
+  glm::vec3 eye = Game::instance().camera()->position();
   modelview.translate(eye);
 }
 
@@ -105,7 +107,6 @@ void Skybox::update(glutil::MatrixStack &modelview, double)
 void Skybox::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
   program->setUniform("matrices.modelViewMatrix", modelview.top());
-  program->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
 
   glDepthMask(0);
   glBindVertexArray(vao_);

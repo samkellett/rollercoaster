@@ -33,49 +33,35 @@
 
 // tbc
 #include "freetypefont.h"
-#include "objmodel.h"
-#include "sphere.h"
 #include "builder.h"
 
+#define OBJECT(Obj) objects_.push_back(new Obj)
+
 Game::Game() : 
-  font_(NULL), barrel_(NULL), horse_(NULL), sphere_(NULL),
-  camera_(NULL), timer_(NULL), dt_(0.0), fps_(0)
+  camera_(NULL), dt_(0.0), fps_(0)
 {
 }
 
 Game::~Game() 
 { 
-  delete font_;
-  delete barrel_;
-  delete horse_;
-  delete sphere_;
-
   while (!objects_.empty()) {
     delete objects_.back();
     objects_.pop_back();
   }
 
-  typedef std::hash_map<std::string, ShaderProgram *>::iterator iterator;
-  for (iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {
+  for (ShaderProgramMap::iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {
     delete program->second;
   }
-
-  delete camera_;
-  delete timer_;
 }
 
 void Game::registerObjects()
 {
-  camera_ = new Camera;
+  OBJECT(Camera);
+  OBJECT(Skybox);
+  OBJECT(Terrain);
+  OBJECT(Builder);
 
-  objects_.push_back(new Skybox);
-  objects_.push_back(new Terrain);
-
-  font_ = new FreeTypeFont;
-  barrel_ = new ObjModel;
-  horse_ = new ObjModel;
-  sphere_ = new Sphere;
-  builder_ = new Builder;
+  camera_ = dynamic_cast<Camera *>(objects_[0]);
 }
 
 void Game::init() 
@@ -126,18 +112,8 @@ void Game::init()
   shader_programs_["fonts"]->addShader(&shaders[3]);
   shader_programs_["fonts"]->link();
   
-  font_->loadSystemFont("arial.ttf", 32);
-  font_->setShaderProgram(shader_programs_["fonts"]);
-
-  // Load some meshes in OBJ format
-  // Downloaded from http://www.psionicgames.com/?page_id=24 on 24 Jan 2013
-  barrel_->load("resources/models/Barrel/Barrel02.obj", "Barrel02.mtl");
-
-  // Downloaded from http://opengameart.org/content/horse-lowpoly on 24 Jan 2013
-  horse_->load("resources/models/Horse/Horse2.obj", "Horse2.mtl");
-
-  // Texture downloaded from http://www.psionicgames.com/?page_id=26 on 24 Jan 2013
-  sphere_->create("resources/textures/", "dirtpile01.jpg", 25, 25);
+  font_.loadSystemFont("arial.ttf", 32);
+  font_.setShaderProgram(shader_programs_["fonts"]);
 
   // Set the texture sampler in the fragment shader
   shader_programs_["main"]->setUniform("gSampler", 0);
@@ -160,7 +136,6 @@ void Game::loop()
   main->setUniform("bUseTexture", true);
 
   // Set the projection and modelview matrix based on the current camera location  
-  camera_->update(dt_);
   main->setUniform("matrices.projMatrix", camera_->perspectiveMatrix());
   modelview.lookAt(camera_->position(), camera_->view(), camera_->upVector());
 
@@ -180,56 +155,21 @@ void Game::loop()
   main->setUniform("material1.Ms", glm::vec3(0.0f)); // Specular material reflectance
   main->setUniform("material1.shininess", 15.0f); // Shininess material property
 
+  // Calculate normals
+  for (ShaderProgramMap::iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {
+    ShaderProgram *shader_program = program->second;
+    shader_program->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
+  }
+
+  // Update / render
   for (unsigned int i = 0; i < objects_.size(); ++i) {
     modelview.push();
-      objects_[i]->update(modelview, dt_);
-      objects_[i]->render(modelview, shader_programs_[objects_[i]->program()]);
+      GameObject *object = objects_[i];
+
+      object->update(modelview, dt_);
+      object->render(modelview, shader_programs_[object->program()]);
     modelview.pop();
   }
-  
-  // Render the horse 
-  modelview.push();
-    modelview.translate(glm::vec3(0.0f, 0.0f, 0.0f));
-    modelview.rotate(glm::vec3(0.0f, 1.0f, 0.0f), 180.0f);
-    modelview.scale(2.5f);
-
-    main->setUniform("matrices.modelViewMatrix", modelview.top());
-    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
-
-    horse_->render();
-  modelview.pop();
-
-  // Render the barrel 
-  modelview.push();
-    modelview.translate(glm::vec3(100.0f, 0.0f, 0.0f));
-    modelview.scale(5.0f);
-    
-    main->setUniform("matrices.modelViewMatrix", modelview.top());
-    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
-
-    barrel_->render();
-  modelview.pop();
-
-  // Render the sphere
-  modelview.push();
-    modelview.translate(glm::vec3(0.0f, 2.5f, 150.0f));
-    modelview.scale(2.0f);
-
-    main->setUniform("matrices.modelViewMatrix", modelview.top());
-    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
-
-    // To turn off texture mapping and use the sphere colour only (currently white material), uncomment the next line
-    //pMainProgram->SetUniform("bUseTexture", false);
-    sphere_->render();
-  modelview.pop();
-
-  modelview.push();
-    main->setUniform("bUseTexture", false);
-    main->setUniform("matrices.modelViewMatrix", modelview.top());
-    main->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
-
-    builder_->render();
-  modelview.pop();
 
   renderFPS();
 
@@ -239,26 +179,23 @@ void Game::loop()
 
 void Game::renderFPS()
 {
-  static int count = 0;
-  static double elapsed = 0.0f;
-
   ShaderProgram *fonts = shader_programs_["fonts"];
 
   RECT dimensions = window_.dimensions();
   int height = dimensions.bottom - dimensions.top;
 
   // Increase the elapsed time and frame counter
-  elapsed += dt_;
-  ++count;
+  elapsed_ += dt_;
+  ++count_;
 
   // Now we want to subtract the current time by the last time that was stored
   // to see if the time elapsed has been over a second, which means we found our FPS.
-  if(elapsed > 1000 ) {
-    elapsed = 0;
-    fps_ = count;
+  if(elapsed_ > 1000 ) {
+    elapsed_ = 0;
+    fps_ = count_;
 
     // Reset the frames per second
-    count = 0;
+    count_ = 0;
   }
 
   if (fps_ > 0) {
@@ -271,7 +208,7 @@ void Game::renderFPS()
     fonts->setUniform("matrices.projMatrix", camera_->orthographicMatrix());
     fonts->setUniform("vColour", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-    font_->printf(20, height - 20, 20, "FPS: %d", fps_);
+    font_.printf(20, height - 20, 20, "FPS: %d", fps_);
 
     glEnable(GL_DEPTH_TEST);
   }
@@ -280,7 +217,6 @@ void Game::renderFPS()
 
 WPARAM Game::exec() 
 {
-  timer_ = new Timer;
   window_.init(hinstance_);
 
   if(!window_.hdc()) {
@@ -289,7 +225,7 @@ WPARAM Game::exec()
 
   init();
 
-  timer_->start();
+  timer_.start();
   double frame_duration = 1000.0 / (double) Game::FPS;
 
   MSG msg;
@@ -302,9 +238,9 @@ WPARAM Game::exec()
       TranslateMessage(&msg);  
       DispatchMessage(&msg);
     } else {
-      timer_->start();
+      timer_.start();
       loop();
-      dt_ = timer_->elapsed();
+      dt_ = timer_.elapsed();
     }
   }
 
@@ -322,7 +258,7 @@ LRESULT Game::processEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_p
       switch(LOWORD(w_param)) {
         case WA_ACTIVE:
         case WA_CLICKACTIVE:
-          timer_->start();
+          timer_.start();
         break;
       }
     break;

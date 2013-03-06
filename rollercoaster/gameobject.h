@@ -3,7 +3,6 @@
 
 #include "common.h"
 #include "game.h"
-#include "camera.h"
 #include "matrixstack.h"
 #include "shaderprogram.h"
 
@@ -19,12 +18,9 @@ public:
   };
 
 protected:
-  GameObject() : 
-    camera_(Game::instance().camera()) 
+  GameObject()
   {
   }
-
-  Camera *camera_;
 };
 
 #endif
