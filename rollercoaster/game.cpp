@@ -84,10 +84,10 @@ void Game::init()
   // Load shaders
   std::vector<Shader> shaders;
   std::string shader_filenames[] = {
-    "perVertexLighting.vert",
-    "perVertexLighting.frag",
-    "ortho2D.vert",
-    "font2D.frag"
+    "phong.vert",
+    "phong.frag",
+    "hud.vert",
+    "font.frag"
   };
  
   int amount = sizeof(shader_filenames) / sizeof(shader_filenames[0]);
