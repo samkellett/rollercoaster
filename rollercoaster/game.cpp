@@ -26,14 +26,15 @@
 #include "timer.h"
 #include "window.h"
 
-// GameObject's
+#include "lighting.h"
+
+// GameObjects
 #include "camera.h"
 #include "skybox.h"
 #include "terrain.h"
+#include "builder.h"
 #include "hud.h"
 
-// tbc
-#include "builder.h"
 
 #define OBJECT(Obj) objects_.push_back(new Obj)
 
@@ -147,36 +148,7 @@ void Game::loop()
   main->setUniform("matrices.projection", camera_->perspectiveMatrix());
   modelview.lookAt(camera_->position(), camera_->view(), camera_->upVector());
 
-  // Set light and materials in main shader program
-  glm::vec4 position(-100, 100, -100, 1);
-  glm::mat3 normal_matrix = camera_->normal(modelview.top());
-  
-  // Convert light position to eye coordinates, since lighting is done in eye coordinates
-  glm::vec4 light_eye = modelview.top() * position;
-
-  // Position of light source in eye coordinates
-  main->setUniform("light.position", light_eye);
-
-  // Ambient colour of light
-  main->setUniform("light.ambient", glm::vec3(1.0f));
-
-  // Diffuse colour of light
-  main->setUniform("light.diffuse", glm::vec3(1.0f));
-
-  // Specular colour of light
-  main->setUniform("light.specular", glm::vec3(1.0f));
-
-  // Ambient material reflectance
-  main->setUniform("material.ambient", glm::vec3(1.0f));
-
-  // Diffuse material reflectance
-  main->setUniform("material.diffuse", glm::vec3(0.0f));
-
-  // Specular material reflectance
-  main->setUniform("material.specular", glm::vec3(0.0f));
-
-  // Shininess material property
-  main->setUniform("material.shininess", 15.0f);
+  Lighting::white(modelview, main);
 
   // Calculate normals
   for (ShaderProgramMap::iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {

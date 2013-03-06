@@ -19,6 +19,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="hud.h" />
+    <ClInclude Include="lighting.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="terrain.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="freetypefont.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hud.cpp" />
+    <ClCompile Include="lighting.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="terrain.cpp" />
@@ -52,10 +54,10 @@
     <ClCompile Include="vbo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\font2D.frag" />
-    <None Include="resources\shaders\ortho2D.vert" />
-    <None Include="resources\shaders\perVertexLighting.frag" />
-    <None Include="resources\shaders\perVertexLighting.vert" />
+    <None Include="resources\shaders\font.frag" />
+    <None Include="resources\shaders\hud.vert" />
+    <None Include="resources\shaders\phong.frag" />
+    <None Include="resources\shaders\phong.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4973297A-B162-4923-A75B-AF5540474D4C}</ProjectGuid>

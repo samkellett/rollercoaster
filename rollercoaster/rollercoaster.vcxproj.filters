@@ -69,6 +69,9 @@
     <ClInclude Include="hud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lighting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -125,18 +128,21 @@
     <ClCompile Include="hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\font2D.frag">
+    <None Include="resources\shaders\font.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\ortho2D.vert">
+    <None Include="resources\shaders\hud.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\perVertexLighting.frag">
+    <None Include="resources\shaders\phong.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\perVertexLighting.vert">
+    <None Include="resources\shaders\phong.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
