@@ -152,7 +152,7 @@ void FreeTypeFont::print(std::string text, int x, int y, int size)
   }
 
   glBindVertexArray(vao_);
-  fonts_->setUniform("gSampler", 0);
+  fonts_->setUniform("sampler", 0);
 
   glEnable(GL_BLEND);
 

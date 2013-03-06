@@ -8,16 +8,16 @@ uniform struct Matrices
 } matrices;
 
 // Layout of vertex attributes in VBO
-layout (location = 0) in vec2 inPosition;
-layout (location = 1) in vec2 inCoord;
+layout (location = 0) in vec2 position;
+layout (location = 1) in vec2 coord;
 
-out vec2 vTexCoord;
+out vec2 texture_coord;
 
 void main()
 {
 	// Transform the point
-	gl_Position = matrices.projection * matrices.modelview * vec4(inPosition, 0.0, 1.0);
+	gl_Position = matrices.projection * matrices.modelview * vec4(position, 0.0, 1.0);
 
 	// Pass through the texture coord
-	vTexCoord = inCoord;
+	texture_coord = coord;
 }
