@@ -6,6 +6,7 @@
 #include "common.h"
 
 LRESULT CALLBACK WinProc(HWND hWnd,UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK fakeWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 class Window {
 public:
@@ -22,8 +23,6 @@ public:
   void setDimensions(RECT dimensions);
   RECT dimensions();
 
-  bool fullscreen() const;
-
   HDC hdc() const;
   HINSTANCE hinstance() const;
   HGLRC hrc() const;
@@ -38,15 +37,13 @@ private:
   bool initGLEW();
   void registerOpenGLClass(HINSTANCE hInstance);
 
-  bool fullscreen_;
-
   HDC hdc_;
   HINSTANCE hinstance_;
   HGLRC hrc_;
   HWND hwnd_;
 
   LPSTR class_;
-  RECT  dimensions_;
+  RECT dimensions_;
 
   std::string name_;
 };

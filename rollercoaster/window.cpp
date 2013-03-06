@@ -6,12 +6,11 @@
 
 #define SIMPLE_OPENGL_CLASS_NAME "simple_openGL_class_name"
 
-Window::Window() : 
-  fullscreen_(false) 
+Window::Window()
 {
 }
 
-// A message handler for the dummy window -- Sam: hmm........
+// A message handler for the dummy window
 LRESULT CALLBACK fakeWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
   PAINTSTRUCT ps;
@@ -146,17 +145,9 @@ void Window::create(std::string title)
   wcex.lpszMenuName = NULL;
   RegisterClassEx(&wcex);
 
-  if (MessageBox(NULL, "Click Yes to go to windowed mode", "Fullscreen", MB_ICONQUESTION | MB_YESNO) == IDYES) {
-    hwnd_ = CreateWindowEx(0, name_.c_str(), title.c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 0, 0, WIDTH, HEIGHT, NULL, NULL, hinstance_, NULL);
-  } else {
-    DEVMODE settings = {0};
-
-    // Get current display settings
-    EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &settings);
-
-    // WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN are commonly used style for fullscreen -- Sam: why?
-    hwnd_ = CreateWindowEx(0, name_.c_str(), title.c_str(), WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, settings.dmPelsWidth, settings.dmPelsHeight, NULL, NULL, hinstance_, NULL);
-  }
+  int x = (GetSystemMetrics(SM_CXSCREEN) - Window::WIDTH) / 2;
+  int y = (GetSystemMetrics(SM_CYSCREEN) - Window::HEIGHT) / 2;
+  hwnd_ = CreateWindowEx(0, name_.c_str(), title.c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, x, y, Window::WIDTH, Window::HEIGHT, NULL, NULL, hinstance_, NULL);
 
   // Initialise OpenGL here
   initOpenGL();
@@ -248,11 +239,6 @@ void Window::deinit()
     ReleaseDC(hwnd_, hdc_);
   }
 
-  if (fullscreen_) {
-    ChangeDisplaySettings(NULL, 0);
-    ShowCursor(TRUE);
-  }
-
   UnregisterClass(class_, hinstance_);
   PostQuitMessage(0);
 }
@@ -265,10 +251,6 @@ void Window::setDimensions(RECT dimensions)
 RECT Window::dimensions()
 {
   return dimensions_;
-}
-
-bool Window::fullscreen() const {
-  return fullscreen_;
 }
 
 HDC Window::hdc() const

@@ -30,7 +30,7 @@ public:
   WPARAM exec();
 
   void setHInstance(HINSTANCE hinstance);
-  LRESULT processEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_param);
+  LRESULT processEvents(HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 
 private:
   Game::Game();
