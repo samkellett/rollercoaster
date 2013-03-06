@@ -89,7 +89,7 @@ void Terrain::update(glutil::MatrixStack &, double)
 // Render the plane as a triangle strip
 void Terrain::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
-  program->setUniform("matrices.modelViewMatrix", modelview.top());
+  program->setUniform("matrices.modelview", modelview.top());
 
   glBindVertexArray(vao_);
   texture_.bind();

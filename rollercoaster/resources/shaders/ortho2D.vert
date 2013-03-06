@@ -3,8 +3,8 @@
 // Structure for matrices
 uniform struct Matrices
 {
-	mat4 projMatrix;
-	mat4 modelViewMatrix;
+	mat4 projection;
+	mat4 modelview;
 } matrices;
 
 // Layout of vertex attributes in VBO
@@ -16,7 +16,7 @@ out vec2 vTexCoord;
 void main()
 {
 	// Transform the point
-	gl_Position = matrices.projMatrix * matrices.modelViewMatrix * vec4(inPosition, 0.0, 1.0);
+	gl_Position = matrices.projection * matrices.modelview * vec4(inPosition, 0.0, 1.0);
 
 	// Pass through the texture coord
 	vTexCoord = inCoord;

@@ -26,6 +26,8 @@ public:
   ~Game();
 
   Camera *camera();
+  Window &window();
+  int fps();
 
   WPARAM exec();
 
@@ -41,8 +43,6 @@ private:
   void registerObjects();
   void loop();
   
-  void renderFPS();
-
   Window window_;
   HINSTANCE hinstance_;
 
@@ -55,8 +55,6 @@ private:
   Camera *camera_;
   GameObjectList objects_;
   ShaderProgramMap shader_programs_;
-
-  FreeTypeFont font_;
 };
 
 #endif

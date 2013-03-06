@@ -11,8 +11,8 @@ LRESULT CALLBACK fakeWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 class Window {
 public:
   enum {
-    WIDTH = 800,
-    HEIGHT = 600,
+    WIDTH = 960,
+    HEIGHT = 540,
   };
 
   Window();

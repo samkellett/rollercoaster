@@ -1,10 +1,9 @@
-#define _USE_MATH_DEFINES
-
 #include "camera.h"
 
 #include "include/gl/glew.h"
 #include <gl/gl.h>
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "window.h"
@@ -25,10 +24,12 @@ void Camera::set(glm::vec3 &position, glm::vec3 &viewpoint, glm::vec3 &up_vector
 }
 
 // Respond to mouse movement
-void Camera::setViewByMouse()
-{  
-  int middle_x = Window::WIDTH >> 1;
-  int middle_y = Window::HEIGHT >> 1;
+void Camera::mouseHandler(double)
+{
+  ShowCursor(false);
+
+  int middle_x = Window::WIDTH / 2;
+  int middle_y = Window::HEIGHT / 2;
 
   float angle_y = 0.0f;
   float angle_z = 0.0f;
@@ -48,9 +49,7 @@ void Camera::setViewByMouse()
 
   rotation_x -= angle_z;
 
-  // Just a little bit below PI / 2 -- Sam: should be a #define / const / enum?
-  float max_angle = 1.56f;
-
+  float max_angle = (float) M_PI / 2;
   if (rotation_x > max_angle) {
     rotation_x = max_angle;
   } else if (rotation_x < -max_angle) {
@@ -103,9 +102,6 @@ void Camera::update(glutil::MatrixStack &modelview, double dt)
 {
   glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
   strafe_vector_ = glm::normalize(cross);
-
-  setViewByMouse();
-  translateByKeyboard(dt);
 }
 
 void Camera::render(glutil::MatrixStack &modelview, ShaderProgram *program)
@@ -113,7 +109,7 @@ void Camera::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 }
 
 // Update the camera to respond to key presses for translation
-void Camera::translateByKeyboard(double dt)
+void Camera::keyboardHandler(double dt)
 {
   if(GetKeyState(87) & 0x80) {    
     advance(1.0 * dt);  
@@ -188,7 +184,7 @@ glm::mat4 Camera::viewMatrix()
 }
 
 // The normal matrix is used to transform normals to eye coordinates -- part of lighting calculations
-glm::mat3 Camera::normalMatrix(const glm::mat4 &modelview)
+glm::mat3 Camera::normal(const glm::mat4 &modelview)
 {
   return glm::transpose(glm::inverse(glm::mat3(modelview)));
 }

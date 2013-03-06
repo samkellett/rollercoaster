@@ -33,8 +33,8 @@ void Builder::update(glutil::MatrixStack &modelview, double dt)
 
 void Builder::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
-  program->setUniform("bUseTexture", false);
-  program->setUniform("matrices.modelViewMatrix", modelview.top());
+  program->setUniform("textured", false);
+  program->setUniform("matrices.modelview", modelview.top());
 
   glBindVertexArray(vao_);
 

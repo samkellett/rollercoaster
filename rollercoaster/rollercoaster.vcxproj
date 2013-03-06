@@ -18,6 +18,7 @@
     <ClInclude Include="freetypefont.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
+    <ClInclude Include="hud.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="terrain.h" />
@@ -36,6 +37,7 @@
     <ClCompile Include="catmullrom.cpp" />
     <ClCompile Include="freetypefont.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="hud.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="terrain.cpp" />

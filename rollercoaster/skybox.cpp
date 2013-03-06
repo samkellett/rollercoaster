@@ -106,7 +106,7 @@ void Skybox::update(glutil::MatrixStack &modelview, double)
 // Render the skybox
 void Skybox::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
-  program->setUniform("matrices.modelViewMatrix", modelview.top());
+  program->setUniform("matrices.modelview", modelview.top());
 
   glDepthMask(0);
   glBindVertexArray(vao_);

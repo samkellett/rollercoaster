@@ -39,12 +39,6 @@ public:
   // Rotate the camera viewpoint -- this effectively rotates the camera
   void rotateViewPoint(float theta, glm::vec3 &point);
 
-  // Respond to mouse movement to rotate the camera
-  void setViewByMouse();
-
-  // Respond to keyboard presses on arrow keys to translate the camera
-  void translateByKeyboard(double dt);
-
   // Strafe the camera (move it side to side)
   void strafe(double direction);
 
@@ -55,9 +49,11 @@ public:
   void setPerspectiveMatrix(float fov, float aspect_ratio, float near, float far);
   void setOrthographicMatrix(int width, int height);
 
-  glm::mat3 normalMatrix(const glm::mat4 &modelview);
+  glm::mat3 normal(const glm::mat4 &modelview);
 
   // GameObject methods
+  void mouseHandler(double dt);
+  void keyboardHandler(double dt);
   void update(glutil::MatrixStack &modelview, double dt);
   void render(glutil::MatrixStack &modelview, ShaderProgram *program);
 

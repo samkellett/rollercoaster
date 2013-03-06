@@ -30,9 +30,9 @@
 #include "camera.h"
 #include "skybox.h"
 #include "terrain.h"
+#include "hud.h"
 
 // tbc
-#include "freetypefont.h"
 #include "builder.h"
 
 #define OBJECT(Obj) objects_.push_back(new Obj)
@@ -60,8 +60,9 @@ void Game::registerObjects()
   OBJECT(Skybox);
   OBJECT(Terrain);
   OBJECT(Builder);
+  OBJECT(HUD);
 
-  camera_ = dynamic_cast<Camera *>(objects_[0]);
+  camera_ = (Camera *) objects_[0];
 }
 
 void Game::init() 
@@ -82,38 +83,45 @@ void Game::init()
 
   // Load shaders
   std::vector<Shader> shaders;
-  std::vector<std::string> shader_filenames;
-
-  shader_filenames.push_back("perVertexLighting.vert");
-  shader_filenames.push_back("perVertexLighting.frag");
-  shader_filenames.push_back("ortho2D.vert");
-  shader_filenames.push_back("font2D.frag");
-
-  for (int i = 0; i < (int) shader_filenames.size(); ++i) {
+  std::string shader_filenames[] = {
+    "perVertexLighting.vert",
+    "perVertexLighting.frag",
+    "ortho2D.vert",
+    "font2D.frag"
+  };
+ 
+  int amount = sizeof(shader_filenames) / sizeof(shader_filenames[0]);
+  for (int i = 0; i < amount; ++i) {
     std::string ext = shader_filenames[i].substr((int) shader_filenames[i].size() - 4, 4);
-    int shader_type = ext == "vert" ? GL_VERTEX_SHADER : (ext == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
+    int shader_type;
+    if (ext == "vert") {
+      shader_type = GL_VERTEX_SHADER;
+    } else if (ext == "frag") {
+      shader_type = GL_FRAGMENT_SHADER;
+    } else {
+      shader_type = GL_GEOMETRY_SHADER;
+    }
 
     Shader shader;
     shader.loadShader("resources/shaders/" + shader_filenames[i], shader_type);
     shaders.push_back(shader);
   }
 
-  // Create the main shader program
-  shader_programs_["main"] = new ShaderProgram;
-  shader_programs_["main"]->create();
-  shader_programs_["main"]->addShader(&shaders[0]);
-  shader_programs_["main"]->addShader(&shaders[1]);
-  shader_programs_["main"]->link();
-  
-  // Create a shader program for fonts
-  shader_programs_["fonts"] = new ShaderProgram;
-  shader_programs_["fonts"]->create();
-  shader_programs_["fonts"]->addShader(&shaders[2]);
-  shader_programs_["fonts"]->addShader(&shaders[3]);
-  shader_programs_["fonts"]->link();
-  
-  font_.loadSystemFont("arial.ttf", 32);
-  font_.setShaderProgram(shader_programs_["fonts"]);
+  // Create shader programs
+  char *programs[] = {
+    "main",
+    "fonts"
+  };
+
+  for (int i = 0; i < sizeof(programs) / sizeof(programs[0]); ++i) {
+    char *name = programs[i];
+
+    shader_programs_[name] = new ShaderProgram;
+    shader_programs_[name]->create();
+    shader_programs_[name]->addShader(&shaders[i * 2]);
+    shader_programs_[name]->addShader(&shaders[i * 2 + 1]);
+    shader_programs_[name]->link();
+  }
 
   // Set the texture sampler in the fragment shader
   shader_programs_["main"]->setUniform("gSampler", 0);
@@ -133,87 +141,77 @@ void Game::loop()
   // Use the main shader program 
   ShaderProgram *main = shader_programs_["main"];
   main->use();
-  main->setUniform("bUseTexture", true);
+  main->setUniform("textured", true);
 
   // Set the projection and modelview matrix based on the current camera location  
-  main->setUniform("matrices.projMatrix", camera_->perspectiveMatrix());
+  main->setUniform("matrices.projection", camera_->perspectiveMatrix());
   modelview.lookAt(camera_->position(), camera_->view(), camera_->upVector());
 
   // Set light and materials in main shader program
   glm::vec4 position(-100, 100, -100, 1);
-  glm::mat3 normal_matrix = camera_->normalMatrix(modelview.top());
+  glm::mat3 normal_matrix = camera_->normal(modelview.top());
   
   // Convert light position to eye coordinates, since lighting is done in eye coordinates
   glm::vec4 light_eye = modelview.top() * position;
 
-  main->setUniform("light1.position", light_eye); // Position of light source in eye coordinates
-  main->setUniform("light1.La", glm::vec3(1.0f)); // Ambient colour of light
-  main->setUniform("light1.Ld", glm::vec3(1.0f)); // Diffuse colour of light
-  main->setUniform("light1.Ls", glm::vec3(1.0f)); // Specular colour of light
-  main->setUniform("material1.Ma", glm::vec3(1.0f)); // Ambient material reflectance
-  main->setUniform("material1.Md", glm::vec3(0.0f)); // Diffuse material reflectance
-  main->setUniform("material1.Ms", glm::vec3(0.0f)); // Specular material reflectance
-  main->setUniform("material1.shininess", 15.0f); // Shininess material property
+  // Position of light source in eye coordinates
+  main->setUniform("light.position", light_eye);
+
+  // Ambient colour of light
+  main->setUniform("light.ambient", glm::vec3(1.0f));
+
+  // Diffuse colour of light
+  main->setUniform("light.diffuse", glm::vec3(1.0f));
+
+  // Specular colour of light
+  main->setUniform("light.specular", glm::vec3(1.0f));
+
+  // Ambient material reflectance
+  main->setUniform("material.ambient", glm::vec3(1.0f));
+
+  // Diffuse material reflectance
+  main->setUniform("material.diffuse", glm::vec3(0.0f));
+
+  // Specular material reflectance
+  main->setUniform("material.specular", glm::vec3(0.0f));
+
+  // Shininess material property
+  main->setUniform("material.shininess", 15.0f);
 
   // Calculate normals
   for (ShaderProgramMap::iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {
     ShaderProgram *shader_program = program->second;
-    shader_program->setUniform("matrices.normalMatrix", camera_->normalMatrix(modelview.top()));
+    shader_program->setUniform("matrices.normal", camera_->normal(modelview.top()));
   }
 
   // Update / render
   for (unsigned int i = 0; i < objects_.size(); ++i) {
     modelview.push();
       GameObject *object = objects_[i];
+      ShaderProgram *program = shader_programs_[object->program()];
 
+      object->mouseHandler(dt_);
+      object->keyboardHandler(dt_);
       object->update(modelview, dt_);
-      object->render(modelview, shader_programs_[object->program()]);
+
+      program->use();
+      object->render(modelview, program);
     modelview.pop();
   }
 
-  renderFPS();
-
-  // Swap buffers to show the rendered image
-  SwapBuffers(window_.hdc());    
-}
-
-void Game::renderFPS()
-{
-  ShaderProgram *fonts = shader_programs_["fonts"];
-
-  RECT dimensions = window_.dimensions();
-  int height = dimensions.bottom - dimensions.top;
-
-  // Increase the elapsed time and frame counter
   elapsed_ += dt_;
   ++count_;
 
-  // Now we want to subtract the current time by the last time that was stored
-  // to see if the time elapsed has been over a second, which means we found our FPS.
   if(elapsed_ > 1000 ) {
     elapsed_ = 0;
     fps_ = count_;
 
-    // Reset the frames per second
     count_ = 0;
   }
 
-  if (fps_ > 0) {
-    glDisable(GL_DEPTH_TEST);
-
-    // Use the font shader program and render the text
-    fonts->use();
-
-    fonts->setUniform("matrices.modelViewMatrix", glm::mat4(1));
-    fonts->setUniform("matrices.projMatrix", camera_->orthographicMatrix());
-    fonts->setUniform("vColour", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-    font_.printf(20, height - 20, 20, "FPS: %d", fps_);
-
-    glEnable(GL_DEPTH_TEST);
-  }
+  // Swap buffers to show the rendered image
+  SwapBuffers(window_.hdc());    
 }
-    
 
 WPARAM Game::exec() 
 {
@@ -310,4 +308,14 @@ void Game::setHInstance(HINSTANCE hinstance)
 Camera *Game::camera()
 {
   return camera_;
+}
+
+Window &Game::window()
+{
+  return window_;
+}
+
+int Game::fps()
+{
+  return fps_;
 }

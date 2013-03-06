@@ -179,7 +179,7 @@ void FreeTypeFont::print(std::string text, int x, int y, int size)
 
         glm::mat4 modelview = glm::translate(glm::mat4(1.0f), glm::vec3((float) cursor_x, (float) cursor_y, 0.0f));
         modelview = glm::scale(modelview, glm::vec3(fScale));
-        fonts_->setUniform("matrices.modelViewMatrix", modelview);
+        fonts_->setUniform("matrices.modelview", modelview);
         
         // Draw character
         glDrawArrays(GL_TRIANGLE_STRIP, index*4, 4);
