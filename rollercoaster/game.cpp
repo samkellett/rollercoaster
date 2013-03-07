@@ -20,21 +20,19 @@
 
 #include "game.h"
 
+#include "lighting.h"
 #include "matrixstack.h"
 #include "shader.h"
 #include "shaderprogram.h"
 #include "timer.h"
 #include "window.h"
 
-#include "lighting.h"
-
 // GameObjects
 #include "camera.h"
+#include "hud.h"
+#include "rollercoaster.h"
 #include "skybox.h"
 #include "terrain.h"
-#include "builder.h"
-#include "hud.h"
-
 
 #define OBJECT(Obj) objects_.push_back(new Obj)
 
@@ -60,7 +58,7 @@ void Game::registerObjects()
   OBJECT(Camera);
   OBJECT(Skybox);
   OBJECT(Terrain);
-  OBJECT(Builder);
+  OBJECT(Rollercoaster);
   OBJECT(HUD);
 
   camera_ = (Camera *) objects_[0];
@@ -91,8 +89,7 @@ void Game::init()
     "font.frag"
   };
  
-  int amount = sizeof(shader_filenames) / sizeof(shader_filenames[0]);
-  for (int i = 0; i < amount; ++i) {
+  for (int i = 0; i < sizeof(shader_filenames) / sizeof(shader_filenames[0]); ++i) {
     std::string ext = shader_filenames[i].substr((int) shader_filenames[i].size() - 4, 4);
     int shader_type;
     if (ext == "vert") {
@@ -125,7 +122,7 @@ void Game::init()
   }
 
   // Set the texture sampler in the fragment shader
-  shader_programs_["main"]->setUniform("gSampler", 0);
+  shader_programs_["main"]->setUniform("sampler", 0);
 }
 
 void Game::loop() 

@@ -8,7 +8,12 @@
 class Sphere
 {
 public:
+  Sphere();
+  Sphere(int slices, int stacks);
+
+  void create(int slices, int stacks);
   void create(std::string directory, std::string front, int slices, int stacks);
+  
   void render();
   void release();
 

@@ -24,4 +24,6 @@ protected:
   GameObject() {}
 };
 
+typedef std::vector<GameObject *> GameObjectList;
+
 #endif

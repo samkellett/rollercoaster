@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="builder.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="catmullrom.h" />
     <ClInclude Include="common.h" />
@@ -20,6 +19,8 @@
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="hud.h" />
     <ClInclude Include="lighting.h" />
+    <ClInclude Include="point.h" />
+    <ClInclude Include="rollercoaster.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="terrain.h" />
@@ -33,13 +34,14 @@
     <ClInclude Include="vbo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="builder.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="catmullrom.cpp" />
     <ClCompile Include="freetypefont.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hud.cpp" />
     <ClCompile Include="lighting.cpp" />
+    <ClCompile Include="point.cpp" />
+    <ClCompile Include="rollercoaster.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="terrain.cpp" />

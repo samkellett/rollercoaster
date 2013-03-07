@@ -15,7 +15,7 @@ class ShaderProgram;
 typedef std::hash_map<std::string, ShaderProgram *> ShaderProgramMap;
 typedef std::vector<GameObject *> GameObjectList;
 
-class Game 
+class Game
 {
 public:
   enum {

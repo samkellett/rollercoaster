@@ -2,6 +2,16 @@
 
 #include "common.h"
 
+Sphere::Sphere()
+{
+  create(10, 10);
+}
+
+Sphere::Sphere(int slices, int stacks)
+{
+  create(slices, stacks);
+}
+
 // Create a unit sphere 
 void Sphere::create(std::string directory, std::string filename, int slices, int stacks)
 {
@@ -14,7 +24,12 @@ void Sphere::create(std::string directory, std::string filename, int slices, int
   texture_.setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR);
   texture_.setSamplerParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
   texture_.setSamplerParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-  
+
+  create(slices, stacks);
+}
+
+void Sphere::create(int slices, int stacks)
+{  
   glGenVertexArrays(1, &vao_);
   glBindVertexArray(vao_);
 
@@ -83,7 +98,7 @@ void Sphere::create(std::string directory, std::string filename, int slices, int
   triangles_ = vertices.size() /  3;
   vbo_.uploadDataToGPU(GL_STATIC_DRAW);
 
-  GLsizei stride = 2 * sizeof(glm::vec3) + sizeof(glm::vec2);
+  GLsizei stride = sizeof(glm::vec3) + sizeof(glm::vec2) + sizeof(glm::vec3);
 
   // Vertex positions
   glEnableVertexAttribArray(0);
