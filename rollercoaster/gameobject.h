@@ -5,10 +5,16 @@
 #include "game.h"
 #include "matrixstack.h"
 #include "shaderprogram.h"
+#include "lighting.h"
 
 class GameObject
 {
 public:
+  virtual void init(ShaderProgram *program)
+  {
+    program->setUniform("sampler0", 0);
+  }
+
   virtual void update(glutil::MatrixStack &modelview, double dt) = 0;
   virtual void render(glutil::MatrixStack &modelview, ShaderProgram *program) = 0;
 

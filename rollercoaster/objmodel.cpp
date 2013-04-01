@@ -1,61 +1,7 @@
 #include "objmodel.h"
 
-ObjModel::ObjModel() :
+ObjModel::ObjModel(std::string filename, std::string material) :
   loaded_(false), attributes_(0)
-{
-}
-
-/*-----------------------------------------------
-  Name:    split
-  Params:  s - std::string to split
-       t - std::string to split according to
-  Result:  Splits std::string according to some substd::string
-       and returns it as a vector.
-/*---------------------------------------------*/
-std::vector<std::string> split(std::string s, std::string t)
-{
-  std::vector<std::string> res;
-  while(true) {
-    int pos = s.find(t);
-    if(pos == -1){
-      res.push_back(s); 
-      break;
-    }
-    
-    res.push_back(s.substr(0, pos));
-//  s = s.substr(pos + 1, ESZ(s) - pos - 1);
-    s = s.substr(pos + 1, (int) s.size() - pos - 1);
-  }
-
-  return res;
-}
-
-/*-----------------------------------------------
-  Name:    getDirectoryPath
-  Params:  sFilePath - file path
-  Result:  Returns path of a directory from file path.
-/*---------------------------------------------*/
-std::string getDirectoryPath(std::string path)
-{
-  // Get directory path
-  std::string directory = "";
-  for (int i = (int) path.size() - 1; i >= 0; --i) {
-    if(path[i] == '\\' || path[i] == '/') {
-      directory = path.substr(0, i + 1);
-      break;
-    }
-  }
-
-  return directory;
-}
-
-/*-----------------------------------------------
-  Name:    loadModel
-  Params:  sFileName - full path mode file name
-       sMtlFileName - relative path material file
-  Result:  Loads obj model.
-/*---------------------------------------------*/
-bool ObjModel::load(std::string filename, std::string material)
 {
   FILE* file;
   fopen_s(&file, filename.c_str(), "rt");
@@ -65,7 +11,7 @@ bool ObjModel::load(std::string filename, std::string material)
     sprintf_s(message, "Cannot load obj model\n%s\n", filename.c_str());
     MessageBox(NULL, message, "Error", MB_ICONERROR);
 
-    return false;
+    return;
   }
 
   char line[255];
@@ -166,7 +112,7 @@ bool ObjModel::load(std::string filename, std::string material)
 
         if(error) {
           fclose(file);
-          return false;
+          return;
         }
       
         // Check whether vertex index is within boundaries (indexed from 1)
@@ -192,7 +138,7 @@ bool ObjModel::load(std::string filename, std::string material)
   fclose(file);
 
   if(attributes_ == 0) {
-    return false;
+    return;
   }
 
   // Create VBO
@@ -251,8 +197,50 @@ bool ObjModel::load(std::string filename, std::string material)
 
   // Material should be in the same directory as model
   loadMaterial(getDirectoryPath(filename) + material);
+}
 
-  return true;
+/*-----------------------------------------------
+  Name:    split
+  Params:  s - std::string to split
+       t - std::string to split according to
+  Result:  Splits std::string according to some substd::string
+       and returns it as a vector.
+/*---------------------------------------------*/
+std::vector<std::string> split(std::string s, std::string t)
+{
+  std::vector<std::string> res;
+  while(true) {
+    int pos = s.find(t);
+    if(pos == -1){
+      res.push_back(s); 
+      break;
+    }
+    
+    res.push_back(s.substr(0, pos));
+//  s = s.substr(pos + 1, ESZ(s) - pos - 1);
+    s = s.substr(pos + 1, (int) s.size() - pos - 1);
+  }
+
+  return res;
+}
+
+/*-----------------------------------------------
+  Name:    getDirectoryPath
+  Params:  sFilePath - file path
+  Result:  Returns path of a directory from file path.
+/*---------------------------------------------*/
+std::string getDirectoryPath(std::string path)
+{
+  // Get directory path
+  std::string directory = "";
+  for (int i = (int) path.size() - 1; i >= 0; --i) {
+    if(path[i] == '\\' || path[i] == '/') {
+      directory = path.substr(0, i + 1);
+      break;
+    }
+  }
+
+  return directory;
 }
 
 /*-----------------------------------------------

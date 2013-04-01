@@ -2,35 +2,50 @@
 #define TERRAIN_H
 
 #include "gameobject.h"
+#include "facevertexmesh.h"
+#include "include\freeimage\FreeImage.h"
 
-#include "texture.h"
-#include "vbo.h"
-
-#include "./include/glm/gtc/type_ptr.hpp"
-
-// Create the planar terrain
-// Texture downloaded from http://www.psionicgames.com/?page_id=26 on 24 Jan 2013
-// Class for generating a xz plane of a given size
 class Terrain : public GameObject
 {
 public:
-  Terrain();
-  ~Terrain();
+	Terrain();
+	~Terrain();
 
+	float height(glm::vec3 point);
+
+  void init(ShaderProgram *program);
   void update(glutil::MatrixStack &modelview, double dt);
   void render(glutil::MatrixStack &modelview, ShaderProgram *program);
 
+  std::string program();
+
 private:
-  UINT vao_;
-  VBO vbo_;
+  char *heightmap_filename_;
 
-  Texture texture_;
-  std::string directory_;
-  std::string filename_;
+  float min_height_;
+  float max_height_;
 
-  float width_;
-  float height_;
-  float texture_repeat_;
+	unsigned int width_;
+  unsigned int height_;
+
+	float *heightmap_;
+	FaceVertexMesh mesh_;
+	
+  UINT height_texture_;
+
+	float sizex_;
+  float sizez_;
+  float scaley_;
+
+  std::vector<char *> texture_images_;
+  std::vector<Texture> textures_;
+
+	glm::vec3 origin_;
+	FIBITMAP *dib_;
+
+	glm::vec3 toImageCoordinates(glm::vec3 point);
+	glm::vec3 toWorldCoordinates(glm::vec3 point);
+	bool imageBytes(char *filename, BYTE **data, unsigned int &width, unsigned int &height);
 };
 
 #endif

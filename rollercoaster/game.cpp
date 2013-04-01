@@ -29,15 +29,21 @@
 
 // GameObjects
 #include "camera.h"
-#include "hud.h"
-#include "rollercoaster.h"
 #include "skybox.h"
 #include "terrain.h"
+#include "hud.h"
 
+#include "rollercoaster.h"
+#include "pyramid.h"
+#include "tree.h"
+
+// Some prettifiers
 #define OBJECT(Obj) objects_.push_back(new Obj)
+#define GAMEOBJECT(Obj, i) (Obj *) objects_[i]
+#define SHADER_PROGRAM(name) programs_.push_back(#name)
 
 Game::Game() : 
-  camera_(NULL), dt_(0.0), fps_(0)
+  camera_(NULL), terrain_(NULL), dt_(0.0), fps_(0)
 {
 }
 
@@ -55,13 +61,29 @@ Game::~Game()
 
 void Game::registerObjects()
 {
+  // Shader Programs:
+  SHADER_PROGRAM(main);
+  SHADER_PROGRAM(terrain);
+  SHADER_PROGRAM(fonts);
+  SHADER_PROGRAM(trees);
+
+  // GameObjects:
   OBJECT(Camera);
   OBJECT(Skybox);
   OBJECT(Terrain);
-  OBJECT(Rollercoaster);
   OBJECT(HUD);
 
-  camera_ = (Camera *) objects_[0];
+  OBJECT(Rollercoaster);
+
+  OBJECT(Tree("obj__plamt2"));
+
+  OBJECT(Pyramid);
+  OBJECT(Pyramid(glm::vec3(2.0f, 0.0f, 4.0f), 2.5f));
+
+  // GameObjects that are tightly coupled need to be explicitely defined:
+  // (this kinda sucks, but fuck it...)
+  camera_ = GAMEOBJECT(Camera, 0);
+  terrain_ = GAMEOBJECT(Terrain, 2);
 }
 
 void Game::init() 
@@ -82,14 +104,20 @@ void Game::init()
 
   // Load shaders
   std::vector<Shader> shaders;
-  std::string shader_filenames[] = {
-    "phong.vert",
-    "phong.frag",
-    "hud.vert",
-    "font.frag"
-  };
+  std::vector<std::string> shader_filenames;
+
+  WIN32_FIND_DATA file;
+  HANDLE find = FindFirstFile("resources/shaders/*", &file);
+  if (find != INVALID_HANDLE_VALUE) {
+    do {
+      if ((file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+        shader_filenames.push_back(file.cFileName);
+      }
+    } while(FindNextFile(find, &file) != 0);
+    FindClose(find);
+  }
  
-  for (int i = 0; i < sizeof(shader_filenames) / sizeof(shader_filenames[0]); ++i) {
+  for (unsigned int i = 0; i < shader_filenames.size(); ++i) {
     std::string ext = shader_filenames[i].substr((int) shader_filenames[i].size() - 4, 4);
     int shader_type;
     if (ext == "vert") {
@@ -101,28 +129,62 @@ void Game::init()
     }
 
     Shader shader;
-    shader.loadShader("resources/shaders/" + shader_filenames[i], shader_type);
+    shader.loadShader("resources/shaders/", shader_filenames[i], shader_type);
     shaders.push_back(shader);
   }
 
-  // Create shader programs
-  char *programs[] = {
-    "main",
-    "fonts"
-  };
-
-  for (int i = 0; i < sizeof(programs) / sizeof(programs[0]); ++i) {
-    char *name = programs[i];
+  for (unsigned int i = 0; i < programs_.size(); ++i) {
+    char *name = programs_[i];
 
     shader_programs_[name] = new ShaderProgram;
     shader_programs_[name]->create();
-    shader_programs_[name]->addShader(&shaders[i * 2]);
-    shader_programs_[name]->addShader(&shaders[i * 2 + 1]);
+
+    for (unsigned int j = 0; j < shaders.size(); ++j) {
+      if (shaders[j].name() == name) {
+        shader_programs_[name]->addShader(&shaders[j]);
+      }
+    }
+
     shader_programs_[name]->link();
   }
 
-  // Set the texture sampler in the fragment shader
-  shader_programs_["main"]->setUniform("sampler", 0);
+  // Initialise GameObjects:
+  for (unsigned int i = 0; i < objects_.size(); ++i) {
+    GameObject *object = objects_[i];
+    ShaderProgram *program = shader_programs_[object->program()];
+
+    program->use();
+    object->init(program);
+  }
+}
+
+void Game::setHInstance(HINSTANCE hinstance) 
+{
+  hinstance_ = hinstance;
+}
+
+Camera *Game::camera()
+{
+  return camera_;
+}
+
+Window &Game::window()
+{
+  return window_;
+}
+
+float Game::height(glm::vec3 point)
+{
+  if (terrain_) {
+    return terrain_->height(point);
+  } else {
+    return 0.0f;
+  }
+}
+
+int Game::fps()
+{
+  return fps_;
 }
 
 void Game::loop() 
@@ -130,27 +192,24 @@ void Game::loop()
   // Clear the buffers and enable depth testing (z-buffering)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
 
   // Set up a matrix stack
   glutil::MatrixStack modelview;
   modelview.setIdentity();
 
-  // Use the main shader program 
-  ShaderProgram *main = shader_programs_["main"];
-  main->use();
-  main->setUniform("textured", true);
-
-  // Set the projection and modelview matrix based on the current camera location  
-  main->setUniform("matrices.projection", camera_->perspectiveMatrix());
+  // Set the projection and modelview matrix based on the current camera location
   modelview.lookAt(camera_->position(), camera_->view(), camera_->upVector());
-
-  Lighting::white(modelview, main);
 
   // Calculate normals
   for (ShaderProgramMap::iterator program(shader_programs_.begin()); program != shader_programs_.end(); ++program) {
     ShaderProgram *shader_program = program->second;
+
+    shader_program->use();
+    shader_program->setUniform("matrices.projection", camera_->perspectiveMatrix());
     shader_program->setUniform("matrices.normal", camera_->normal(modelview.top()));
+
+    Lighting::white(modelview, shader_program);
   }
 
   // Update / render
@@ -267,24 +326,4 @@ Game& Game::instance()
   static Game instance;
 
   return instance;
-}
-
-void Game::setHInstance(HINSTANCE hinstance) 
-{
-  hinstance_ = hinstance;
-}
-
-Camera *Game::camera()
-{
-  return camera_;
-}
-
-Window &Game::window()
-{
-  return window_;
-}
-
-int Game::fps()
-{
-  return fps_;
 }

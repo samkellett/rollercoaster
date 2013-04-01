@@ -9,6 +9,7 @@ class Lighting
 {
 public:
   static void white(glutil::MatrixStack &modelview, ShaderProgram *program);
+  static void diffuseSpecular(glutil::MatrixStack &modelview, ShaderProgram *program);
 };
 
 #endif

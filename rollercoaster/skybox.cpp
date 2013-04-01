@@ -7,16 +7,16 @@
 #include "include/glm/gtc/type_ptr.hpp"
 
 // Create the skybox
-// Skybox downloaded from http://www.akimbo.in/forum/viewtopic.php?f=10&t=9
+// Skybox downloaded from http://www.alusion-fr.com/an1ffa1.htm
 Skybox::Skybox() : GameObject(),
-  directory_("resources/skyboxes/jajdarkland1/"),
-  front_("jajdarkland1_ft.jpg"),
-  back_("jajdarkland1_bk.jpg"),
-  left_("jajdarkland1_lf.jpg"),
-  right_("jajdarkland1_rt.jpg"),
-  top_("jajdarkland1_up.jpg"),
-  bottom_("jajdarkland1_dn.jpg"),
-  size_(2500.0f)
+  directory_("resources/skyboxes/faesky02/"),
+  front_("faesky02right.jpg"),
+  back_("faesky02left.jpg"),
+  left_("faesky02front.jpg"),
+  right_("faesky02back.jpg"),
+  top_("faesky02up.jpg"),
+  bottom_("faesky02down.jpg"),
+  size_(500.0f)
 {
   textures_[0].load(directory_ + front_);
   textures_[1].load(directory_ + back_);

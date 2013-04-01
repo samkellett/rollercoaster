@@ -19,7 +19,7 @@ Rollercoaster::~Rollercoaster()
 glm::vec3 Rollercoaster::point(double d)
 {
   float total_length = distances_[distances_.size() - 1];
-  float length = d - (int) (d / total_length) * total_length;
+  float length = (float) (d - (int) (d / total_length) * total_length);
   
   int segment;
   
@@ -127,7 +127,7 @@ void Rollercoaster::render(glutil::MatrixStack &modelview, ShaderProgram *progra
 {
   program->setUniform("texture", false);
   
-  for (int i = 0; i < points_.size(); ++i) {
+  for (unsigned int i = 0; i < points_.size(); ++i) {
     Point *point = points_.at(i);
 
     modelview.push();

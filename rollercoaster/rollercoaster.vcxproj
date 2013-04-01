@@ -14,52 +14,63 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="catmullrom.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="facevertexmesh.h" />
     <ClInclude Include="freetypefont.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="hud.h" />
     <ClInclude Include="lighting.h" />
     <ClInclude Include="point.h" />
+    <ClInclude Include="pyramid.h" />
     <ClInclude Include="rollercoaster.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderprogram.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="terrain.h" />
+    <ClInclude Include="tree.h" />
+    <ClInclude Include="vertex.h" />
     <ClInclude Include="window.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="matrixstack.h" />
     <ClInclude Include="objmodel.h" />
     <ClInclude Include="skybox.h" />
-    <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="vbo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="catmullrom.cpp" />
+    <ClCompile Include="facevertexmesh.cpp" />
     <ClCompile Include="freetypefont.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hud.cpp" />
     <ClCompile Include="lighting.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="pyramid.cpp" />
     <ClCompile Include="rollercoaster.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderprogram.cpp" />
+    <ClCompile Include="sphere.cpp" />
     <ClCompile Include="terrain.cpp" />
+    <ClCompile Include="tree.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrixstack.cpp" />
     <ClCompile Include="objmodel.cpp" />
     <ClCompile Include="skybox.cpp" />
-    <ClCompile Include="sphere.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="vbo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\font.frag" />
-    <None Include="resources\shaders\hud.vert" />
-    <None Include="resources\shaders\phong.frag" />
-    <None Include="resources\shaders\phong.vert" />
+    <None Include="resources\shaders\fonts.frag" />
+    <None Include="resources\shaders\fonts.vert" />
+    <None Include="resources\shaders\main.frag" />
+    <None Include="resources\shaders\main.vert" />
+    <None Include="resources\shaders\terrain.frag" />
+    <None Include="resources\shaders\terrain.vert" />
+    <None Include="resources\shaders\trees.frag" />
+    <None Include="resources\shaders\trees.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4973297A-B162-4923-A75B-AF5540474D4C}</ProjectGuid>

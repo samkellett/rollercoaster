@@ -33,9 +33,6 @@
     <ClInclude Include="skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -60,12 +57,6 @@
     <ClInclude Include="gameobject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hud.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="lighting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,6 +64,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rollercoaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pyramid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="facevertexmesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,9 +110,6 @@
     <ClCompile Include="skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -122,12 +131,6 @@
     <ClCompile Include="catmullrom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="terrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="hud.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -137,18 +140,48 @@
     <ClCompile Include="rollercoaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pyramid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="facevertexmesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\font.frag">
+    <None Include="resources\shaders\main.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\hud.vert">
+    <None Include="resources\shaders\main.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\phong.frag">
+    <None Include="resources\shaders\terrain.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\phong.vert">
+    <None Include="resources\shaders\terrain.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\fonts.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\fonts.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\trees.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="resources\shaders\trees.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

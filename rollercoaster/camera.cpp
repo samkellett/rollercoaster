@@ -10,8 +10,10 @@
 
 // Constructor for camera -- initialise with some default values
 Camera::Camera() :
-  position_(glm::vec3(0.0f, 10.0f, 100.0f)), view_(glm::vec3(0.0f, 0.0f, 0.0f)),
-  up_vector_(glm::vec3(0.0f, 1.0f, 0.0f)), speed_(0.025f)
+  position_(glm::vec3(0.0f, -170.0f, 100.0f)),
+  view_(glm::vec3(0.0f, -170.0f, 0.0f)),
+  up_vector_(glm::vec3(0.0f, 1.0f, 0.0f)),
+  speed_(0.04f)
 {
 }
  
@@ -104,7 +106,7 @@ void Camera::update(glutil::MatrixStack &modelview, double dt)
   strafe_vector_ = glm::normalize(cross);
 }
 
-void Camera::render(glutil::MatrixStack &modelview, ShaderProgram *program)
+void Camera::render(glutil::MatrixStack &, ShaderProgram *)
 {
 }
 

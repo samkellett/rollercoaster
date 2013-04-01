@@ -5,12 +5,14 @@
 #include "texture.h"
 #include "vbo.h"
 
+std::vector<std::string> split(std::string s, std::string t);
+std::string getDirectoryPath(std::string path);
+
 // Class for handling obj files
 class ObjModel
 {
 public:
-  ObjModel();
-  bool load(std::string file, std::string material);
+  ObjModel(std::string filename, std::string material);
   void render();
   void release();
 

@@ -9,15 +9,17 @@ class Shader
 public:
   Shader();
 
-  bool loadShader(std::string file, int type);
+  bool loadShader(std::string directory, std::string file, int type);
   void deleteShader();
 
   bool linesFromFile(std::string file, bool include_part, std::vector<std::string> *result);
 
+  std::string name() const;
   bool loaded();
   UINT shaderID();
 
 private:
+  std::string name_;
   UINT id_; // ID of shader
   int type_; // GL_VERTEX_SHADER, GL_FRAGMENT_SHADER...
   bool loaded_; // Whether shader was loaded and compiled

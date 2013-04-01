@@ -10,7 +10,7 @@ void Lighting::white(glutil::MatrixStack &modelview, ShaderProgram *program)
   Camera *camera = Game::instance().camera();
 
   // Set light and materials in main shader program
-  glm::vec4 position(-100, 100, -100, 1);
+  glm::vec4 position(-100, -150, -100, 1);
   glm::mat3 normal_matrix = camera->normal(modelview.top());
   
   // Convert light position to eye coordinates, since lighting is done in eye coordinates
@@ -39,4 +39,16 @@ void Lighting::white(glutil::MatrixStack &modelview, ShaderProgram *program)
 
   // Shininess material property
   program->setUniform("material.shininess", 15.0f);
+}
+
+void Lighting::diffuseSpecular(glutil::MatrixStack &, ShaderProgram *program)
+{
+  // Ambient material reflectance
+ 	program->setUniform("material.ambient", glm::vec3(0.5f));
+
+  // Diffuse material reflectance
+	program->setUniform("material.diffuse", glm::vec3(1.0f));
+
+  // Specular material reflectance	
+	program->setUniform("material.specular", glm::vec3(0.0f));
 }

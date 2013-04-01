@@ -9,11 +9,13 @@
 #include "timer.h"
 
 class Camera;
+class Terrain;
 class GameObject;
 class ShaderProgram;
 
-typedef std::hash_map<std::string, ShaderProgram *> ShaderProgramMap;
 typedef std::vector<GameObject *> GameObjectList;
+typedef std::vector<char *> ShaderProgramList;
+typedef std::hash_map<std::string, ShaderProgram *> ShaderProgramMap;
 
 class Game
 {
@@ -27,8 +29,10 @@ public:
 
   Camera *camera();
   Window &window();
-  int fps();
 
+  float height(glm::vec3 point);
+
+  int fps();
   WPARAM exec();
 
   void setHInstance(HINSTANCE hinstance);
@@ -53,7 +57,10 @@ private:
   Timer timer_;
 
   Camera *camera_;
+  Terrain *terrain_;
+
   GameObjectList objects_;
+  ShaderProgramList programs_;
   ShaderProgramMap shader_programs_;
 };
 

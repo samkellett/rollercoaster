@@ -10,10 +10,12 @@ Shader::Shader() :
 }
 
 // Loads a shader, stored as a text file with filename sFile.  The shader is of type iType (vertex, fragment, geometry, etc.)
-bool Shader::loadShader(std::string file, int type)
+bool Shader::loadShader(std::string directory, std::string file, int type)
 {
-  std::vector<std::string> lines;
+  name_ = file.substr(0, file.find("."));
+  file = directory + file;
 
+  std::vector<std::string> lines;
   if(!linesFromFile(file, false, &lines)) {
     char message[1024];
     sprintf_s(message, "Cannot load shader\n%s\n", file.c_str());
@@ -120,6 +122,10 @@ bool Shader::linesFromFile(std::string filepath, bool include_part, std::vector<
   return true;
 }
 
+std::string Shader::name() const
+{
+  return name_;
+}
 
 // Returns true if the shader was loaded and compiled
 bool Shader::loaded()
