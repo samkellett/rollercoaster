@@ -1,14 +1,14 @@
 #include "pyramid.h"
 
 // Create the plane, including its geometry, texture mapping, normal, and colour
-Pyramid::Pyramid(glm::vec3 position, float scale) : GameObject(),
-  position_(position), scale_(scale),
+Pyramid::Pyramid(glm::vec2 position, float scale) : GameObject(),
+  position_(position.x, 0.0f, position.y), scale_(scale),
 
   directory_("resources/textures/"),
   filename_("pyramid.jpg"),
   width_(10.0f),
   height_(7.5f)
-{  
+{
   // Load the texture
   texture_.load(directory_ + filename_, true);
 
@@ -67,7 +67,6 @@ Pyramid::Pyramid(glm::vec3 position, float scale) : GameObject(),
     na, nc, ne
   };
 
-
   // Put the vertex attributes in the VBO
   for (int i = 0; i < 12; ++i) {
     vbo_.addData(&plane_vertices[i], sizeof(glm::vec3));
@@ -102,24 +101,26 @@ Pyramid::~Pyramid()
   vbo_.release();
 }
 
-void Pyramid::init(ShaderProgram *)
+void Pyramid::init(ShaderProgram *program)
 {
+  GameObject::init(program);
+
   Game &game = Game::instance();
-  position_ = glm::vec3(position_.x, game.height(position_), position_.z);
+  position_ = glm::vec3(position_.x, game.height(position_) - 3.0f, position_.z);
 }
 
 void Pyramid::update(glutil::MatrixStack &, double)
 {
 }
 
-// Render the plane as a triangle strip
 void Pyramid::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
-  modelview.scale(scale_);
   modelview.translate(position_);
+  modelview.scale(scale_);
 
-  Lighting::diffuseSpecular(modelview, program);
+  Lighting::diffuseSpecular(program, 0.6f, 1.0f, 1.0f);
   program->setUniform("matrices.modelview", modelview.top());
+  program->setUniform("not_textured", false);
 
   glBindVertexArray(vao_);
   texture_.bind();

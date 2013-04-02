@@ -109,8 +109,6 @@ bool Window::initGLEW()
   DestroyWindow(fake_hwnd);
 
   return result;
-
-  // Sam: I DON'T UNDERSTAND THE POINT!
 }
 
 // Initialise GLEW and create the real game window
@@ -121,8 +119,8 @@ HDC Window::init(HINSTANCE hinstance)
     return false;
   }
 
-  name_ = "OpenGL";
-  create("OpenGL Template");
+  name_ = "Rollercoaster";
+  create("WELCOME TO SAM'S FUCKING AWESOME ROLLERCOASTER ON A MOTHERFUCKING TROPICAL ISLAND!");
 
   // If we never got a valid window handle, quit the program
   return hwnd_ == NULL ? NULL : hdc_;

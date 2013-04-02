@@ -23,10 +23,12 @@ Point::~Point()
 
 void Point::render(glutil::MatrixStack &modelview, ShaderProgram *program)
 {
+  modelview.translate(position_);
+  modelview.scale(1.0f);
+
   program->setUniform("material.ambient", colour_);
   program->setUniform("matrices.modelview", modelview.top());
   
-  modelview.translate(position_);
   sphere_.render();
 }
 

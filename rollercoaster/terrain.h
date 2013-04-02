@@ -5,6 +5,8 @@
 #include "facevertexmesh.h"
 #include "include\freeimage\FreeImage.h"
 
+#include "sphere.h"
+
 class Terrain : public GameObject
 {
 public:

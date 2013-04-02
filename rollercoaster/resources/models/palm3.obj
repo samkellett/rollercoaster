@@ -7,7 +7,7 @@
 # num_faces: 336
 # num_groups: 1
 
-mtllib obj__plamt2.mtl
+mtllib palm3.mtl
 
 v -40.161461 235.595810 45.492214
 v -40.765232 215.977676 19.536388
@@ -1413,9 +1413,9 @@ vt 0.324219 0.498735
 vt 0.492101 0.910812
 # num_uvs: 1008
 
-g palmt2.tga
+g palm3.tga
 
-usemtl palmt2.tga
+usemtl palm3.tga
 f 1/1/1 2/2/2 3/3/3 
 f 1/4/1 4/5/4 2/6/2 
 f 5/7/5 4/8/4 1/9/1 

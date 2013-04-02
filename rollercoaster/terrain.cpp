@@ -237,7 +237,7 @@ void Terrain::render(glutil::MatrixStack &modelview, ShaderProgram *program)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  Lighting::diffuseSpecular(modelview, program);
+  Lighting::diffuseSpecular(program, 0.5f, 0.5f);
 
 	modelview.translate(glm::vec3(0.0f, 0.0f, 0.0f));
 	program->setUniform("matrices.modelview", modelview.top());

@@ -6,7 +6,7 @@
 class Pyramid : public GameObject
 {
 public:
-  Pyramid(glm::vec3 position = glm::vec3(0), float scale = 1.0f);
+  Pyramid(glm::vec2 position = glm::vec2(0), float scale = 1.0f);
   ~Pyramid();
 
   void init(ShaderProgram *);

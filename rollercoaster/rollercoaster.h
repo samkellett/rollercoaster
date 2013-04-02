@@ -2,9 +2,11 @@
 #define ROLLERCOASTER_H
 
 #include "gameobject.h"
+#include "frame.h"
+#include "facevertexmesh.h"
+#include "support.h"
 
 class Point;
-
 typedef std::vector<Point *> PointList;
 
 class Rollercoaster : public GameObject
@@ -13,23 +15,30 @@ public:
   Rollercoaster();
   ~Rollercoaster();
 
+  double t();
+  glm::vec3 point();
   glm::vec3 point(double t);
-  
-  void keyboardHandler(double dt);
 
+  void addDerivative(glm::vec3 position);
+
+  void init(ShaderProgram *program);
   void update(glutil::MatrixStack &modelview, double dt);
   void render(glutil::MatrixStack &modelview, ShaderProgram *program);
 
 private:
-  void buildPath();
-  void computeLength();
+  static const int FACES;
+
+  double t_;
   
-  UINT vao_;
-  VBO vbo_;
-  
-  PointList points_;
+//  UINT vao_;
+//  VBO vbo_;
+  FaceVertexMesh mesh_;
+
+  PointList dirivatives_;
   std::vector<float> distances_;
-  std::vector<glm::vec3> sampled_points_;
+
+  std::vector<Support *> supports_;
+  std::vector<Frame> frames_;
 };
 
 #endif

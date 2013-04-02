@@ -7,16 +7,19 @@
 class Shader
 {
 public:
-  Shader();
-
-  bool loadShader(std::string directory, std::string file, int type);
+  Shader(std::string directory, std::string file, int type);
   void deleteShader();
 
   bool linesFromFile(std::string file, bool include_part, std::vector<std::string> *result);
 
   std::string name() const;
+  int type() const;
+
   bool loaded();
   UINT shaderID();
+
+  static const std::string DEFAULT_VERTEX_SHADER;
+  static const std::string DEFAULT_FRAGMENT_SHADER;
 
 private:
   std::string name_;

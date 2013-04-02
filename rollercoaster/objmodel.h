@@ -5,6 +5,8 @@
 #include "texture.h"
 #include "vbo.h"
 
+#define MODEL(name) new ObjModel("resources/models/" + std::string(name) + ".obj", std::string(name) + ".mtl")
+
 std::vector<std::string> split(std::string s, std::string t);
 std::string getDirectoryPath(std::string path);
 

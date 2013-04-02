@@ -4,11 +4,15 @@
 #include "gameobject.h"
 
 class ObjModel;
+namespace data {
+  struct tree;
+}
 
 class Tree : public GameObject
 {
 public:
   Tree(std::string model, glm::vec3 position = glm::vec3(0.0f));
+  Tree(const data::tree &tree);
   ~Tree();
 
   std::string program();
@@ -19,6 +23,9 @@ public:
 
 private:
   glm::vec3 position_;
+  float scale_;
+  float rotation_;
+
   ObjModel *model_;
 };
 

@@ -4,7 +4,7 @@
 
 Sphere::Sphere()
 {
-  create(10, 10);
+  create(20, 20);
 }
 
 Sphere::Sphere(int slices, int stacks)

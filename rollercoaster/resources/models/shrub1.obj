@@ -7,7 +7,7 @@
 # num_faces: 24
 # num_groups: 1
 
-mtllib aloe1.mtl
+mtllib shrub1.mtl
 
 v -14.235313 44.582336 -21.592922
 v -15.914327 0.012657 -14.306391
@@ -113,9 +113,9 @@ vt 0.499420 0.503336
 vt 0.990900 0.993658
 # num_uvs: 72
 
-g aloe1.tga
+g shrub1.tga
 
-usemtl aloe1.tga
+usemtl shrub1.tga
 f 1/1/1 2/2/2 3/3/3 
 f 3/4/3 2/5/2 1/6/1 
 f 4/7/4 3/8/3 2/9/2 

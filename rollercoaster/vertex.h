@@ -3,9 +3,8 @@
 
 #include "common.h"
 
-class Vertex
+struct Vertex
 {
-public:
 	Vertex()
   {
   }

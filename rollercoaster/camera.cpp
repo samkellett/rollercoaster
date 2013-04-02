@@ -10,6 +10,7 @@
 
 // Constructor for camera -- initialise with some default values
 Camera::Camera() :
+  state_(FREE),
   position_(glm::vec3(0.0f, -170.0f, 100.0f)),
   view_(glm::vec3(0.0f, -170.0f, 0.0f)),
   up_vector_(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -25,45 +26,77 @@ void Camera::set(glm::vec3 &position, glm::vec3 &viewpoint, glm::vec3 &up_vector
   up_vector_ = up_vector;
 }
 
+void Camera::setState(State state)
+{
+  if (state == BIRD) {
+    up_vector_ = glm::vec3(0.0f, 1.0f, 0.0f);
+  }
+
+  switch(state) {
+    case FREE:
+      if (state_ != FPS && state_ != FREE) {
+        position_ = glm::vec3(0.0f, -170.0f, 100.0f);
+        view_ = glm::vec3(0.0f, -170.0f, 0.0f);
+      }
+    break;
+
+    case SIDE:
+      position_ = glm::vec3(0.0f, -170.0f, 400.0f);
+      view_ = glm::vec3(0.0f, -170.0f, 0.0f);
+    break;
+
+    case BIRD:
+      position_ = glm::vec3(0.1f, 600.0f, 0.0f);
+      view_ = glm::vec3(0.0f, -170.0f, 0.1f);
+    break;
+
+    default: break;
+  }
+
+  state_ = state;
+}
+
 // Respond to mouse movement
 void Camera::mouseHandler(double)
 {
-  ShowCursor(false);
+  if (state_ == FREE || state_ == FPS) {
+    ShowCursor(false);
 
-  int middle_x = Window::WIDTH / 2;
-  int middle_y = Window::HEIGHT / 2;
+    int middle_x = Window::WIDTH / 2;
+    int middle_y = Window::HEIGHT / 2;
 
-  float angle_y = 0.0f;
-  float angle_z = 0.0f;
-  static float rotation_x = 0.0f;
+    float angle_y = 0.0f;
+    float angle_z = 0.0f;
+    static float rotation_x = 0.0f;
 
-  POINT mouse;
-  GetCursorPos(&mouse);
+    POINT mouse;
+    GetCursorPos(&mouse);
 
-  if (mouse.x == middle_x && mouse.y == middle_y) {
-    return;
+    if (mouse.x == middle_x && mouse.y == middle_y) {
+      return;
+    }
+
+    SetCursorPos(middle_x, middle_y);
+
+    angle_y = (float) (middle_x - mouse.x) / 1000.0f;
+    angle_z = (float) (middle_y - mouse.y) / 1000.0f;
+
+    rotation_x -= angle_z;
+
+    float max_angle = (float) M_PI / 2;
+    if (rotation_x > max_angle) {
+      rotation_x = max_angle;
+    } else if (rotation_x < -max_angle) {
+      rotation_x = -max_angle;
+    } else {
+      glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
+      glm::vec3 axis = glm::normalize(cross);
+
+      rotateViewPoint(angle_z, axis);
+    }
+
+    rotateViewPoint(angle_y, glm::vec3(0, 1, 0));
   }
-
-  SetCursorPos(middle_x, middle_y);
-
-  angle_y = (float) (middle_x - mouse.x) / 1000.0f;
-  angle_z = (float) (middle_y - mouse.y) / 1000.0f;
-
-  rotation_x -= angle_z;
-
-  float max_angle = (float) M_PI / 2;
-  if (rotation_x > max_angle) {
-    rotation_x = max_angle;
-  } else if (rotation_x < -max_angle) {
-    rotation_x = -max_angle;
-  } else {
-    glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
-    glm::vec3 axis = glm::normalize(cross);
-
-    rotateViewPoint(angle_z, axis);
-  }
-
-  rotateViewPoint(angle_y, glm::vec3(0, 1, 0));
 }
 
 // Rotate the camera view point -- this effectively rotates the camera since it is looking at the view point
@@ -104,36 +137,59 @@ void Camera::update(glutil::MatrixStack &modelview, double dt)
 {
   glm::vec3 cross = glm::cross(view_ - position_, up_vector_);
   strafe_vector_ = glm::normalize(cross);
+
+  if (state_ == FPS) {
+    glm::vec3 position_average;
+    glm::vec3 view_average;
+    int count = 40;
+    
+    for (int i = 0; i < count; ++i) {
+      position_average += Game::instance().futurePoint(i);
+      position_average.y += 5.0f;
+
+      view_average += Game::instance().futurePoint(count / 2 + i);
+      view_average.y += 0.5f;
+    }
+
+    position_ = position_average / (float) count;
+    view_ = view_average / (float) count;
+  }
 }
 
 void Camera::render(glutil::MatrixStack &, ShaderProgram *)
 {
 }
 
-// Update the camera to respond to key presses for translation
 void Camera::keyboardHandler(double dt)
 {
-  if(GetKeyState(87) & 0x80) {    
-    advance(1.0 * dt);  
-  }
+  if (state_ == FREE) {
+    if(GetKeyState(87) & 0x80) {
+      advance(1.0 * dt);
+    }
 
-  if(GetKeyState(83) & 0x80) {  
-    advance(-1.0 * dt);    
-  }
+    if(GetKeyState(83) & 0x80) {
+      advance(-1.0 * dt);
+    }
 
-  if(GetKeyState(65) & 0x80) {  
-    strafe(-1.0 * dt);
-  }
+    if(GetKeyState(65) & 0x80) {
+      strafe(-1.0 * dt);
+    }
 
-  if(GetKeyState(68) & 0x80 ) {      
-    strafe(1.0 * dt);
-  }  
+    if(GetKeyState(68) & 0x80 ) {
+      strafe(1.0 * dt);
+    }
+  }
 }
 
 // Return the camera position
 glm::vec3 Camera::position() const
 {
   return position_;
+}
+
+Camera::State Camera::state()
+{
+  return state_;
 }
 
 // Return the camera view point

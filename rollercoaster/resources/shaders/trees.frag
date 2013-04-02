@@ -14,7 +14,7 @@ void main()
 	
 	// Alpha mask out the black:
 	float cutoff = distance(texture_colour.rgb, vec3(1.0));
-	if (cutoff < 0.75) {
+	if (cutoff < 0.5) {
 		discard;
 	}
 

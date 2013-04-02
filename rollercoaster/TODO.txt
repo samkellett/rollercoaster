@@ -1,0 +1,23 @@
+
+TODO:
+
+ DONE: 1.	Add trees (using a TreeData 
+			file), instanced? No.
+ DONE: 2.	Add pyramids
+
+ DONE: 3.	Add lampposts
+ ...fucking FINALLY
+
+ DONE: 4.	Day / night cycle
+
+ 5.	Dat rollercoaster...
+
+ DONE: 6.	Camera positions
+
+ 7.	If enough time:
+	 -	Shadows
+	 -	Clouds
+	 -	Fog -- No fog, looks shit.
+	 -	Sparks
+
+ 8.	Dat fuckin' report...

@@ -4,13 +4,11 @@
 #include <gl/gl.h>
 #include "./include/glm/gtc/type_ptr.hpp"
 
-Shader::Shader() :
-  loaded_(false)
-{
-}
+const std::string Shader::DEFAULT_VERTEX_SHADER = "main.vert";
+const std::string Shader::DEFAULT_FRAGMENT_SHADER = "main.frag";
 
-// Loads a shader, stored as a text file with filename sFile.  The shader is of type iType (vertex, fragment, geometry, etc.)
-bool Shader::loadShader(std::string directory, std::string file, int type)
+Shader::Shader(std::string directory, std::string file, int type) :
+  loaded_(false)
 {
   name_ = file.substr(0, file.find("."));
   file = directory + file;
@@ -21,7 +19,7 @@ bool Shader::loadShader(std::string directory, std::string file, int type)
     sprintf_s(message, "Cannot load shader\n%s\n", file.c_str());
     MessageBox(NULL, message, "Error", MB_ICONERROR);
 
-    return false;
+    return;
   }
 
   const char **program = new const char *[(int) lines.size()];
@@ -60,15 +58,12 @@ bool Shader::loadShader(std::string directory, std::string file, int type)
     sprintf_s(message, "Error in %s!\n%s\nShader file not compiled.  The compiler returned:\n\n%s", shader_type, file.c_str(), log);
 
     MessageBox(NULL, message, "Error", MB_ICONERROR);
-    return false;
+    return;
   }
 
   type_ = type;
   loaded_ = true;
-
-  return true;
 }
-
 
 // Loads a file into a vector of std::strings (result)
 bool Shader::linesFromFile(std::string filepath, bool include_part, std::vector<std::string>* result)
@@ -125,6 +120,11 @@ bool Shader::linesFromFile(std::string filepath, bool include_part, std::vector<
 std::string Shader::name() const
 {
   return name_;
+}
+
+int Shader::type() const
+{
+  return type_;
 }
 
 // Returns true if the shader was loaded and compiled

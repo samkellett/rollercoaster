@@ -12,13 +12,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="cart.h" />
     <ClInclude Include="catmullrom.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="facevertexmesh.h" />
+    <ClInclude Include="frame.h" />
     <ClInclude Include="freetypefont.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="hud.h" />
+    <ClInclude Include="lamp.h" />
     <ClInclude Include="lighting.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="pyramid.h" />
@@ -26,6 +29,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="sphere.h" />
+    <ClInclude Include="support.h" />
     <ClInclude Include="terrain.h" />
     <ClInclude Include="tree.h" />
     <ClInclude Include="vertex.h" />
@@ -39,11 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="cart.cpp" />
     <ClCompile Include="catmullrom.cpp" />
     <ClCompile Include="facevertexmesh.cpp" />
     <ClCompile Include="freetypefont.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hud.cpp" />
+    <ClCompile Include="lamp.cpp" />
     <ClCompile Include="lighting.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="pyramid.cpp" />
@@ -51,6 +57,7 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="sphere.cpp" />
+    <ClCompile Include="support.cpp" />
     <ClCompile Include="terrain.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="window.cpp" />
@@ -63,14 +70,71 @@
     <ClCompile Include="vbo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\data\track.h" />
+    <None Include="resources\data\trees.h" />
+    <None Include="resources\models\carriage.mtl" />
+    <None Include="resources\models\colours.bmp" />
+    <None Include="resources\models\lamp.jpg" />
+    <None Include="resources\models\lamp.mtl" />
+    <None Include="resources\models\palm3.mtl" />
+    <None Include="resources\models\palm3.tga" />
+    <None Include="resources\models\palm4.mtl" />
+    <None Include="resources\models\palm4.tga" />
+    <None Include="resources\models\palm5.mtl" />
+    <None Include="resources\models\palm5.tga" />
+    <None Include="resources\models\shrub1.mtl" />
+    <None Include="resources\models\shrub1.tga" />
+    <None Include="resources\models\shrub2.mtl" />
+    <None Include="resources\models\shrub2.tga" />
+    <None Include="resources\models\shrub3.mtl" />
+    <None Include="resources\models\shrub3.tga" />
+    <None Include="resources\models\shrub4.mtl" />
+    <None Include="resources\models\shrub4.tga" />
+    <None Include="resources\models\shrub5.mtl" />
+    <None Include="resources\models\shrub5.tga" />
     <None Include="resources\shaders\fonts.frag" />
     <None Include="resources\shaders\fonts.vert" />
     <None Include="resources\shaders\main.frag" />
     <None Include="resources\shaders\main.vert" />
     <None Include="resources\shaders\terrain.frag" />
-    <None Include="resources\shaders\terrain.vert" />
     <None Include="resources\shaders\trees.frag" />
-    <None Include="resources\shaders\trees.vert" />
+    <None Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\models\palm3.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\palm4.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\palm5.obj">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\models\shrub1.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\shrub2.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\shrub3.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\shrub4.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\shrub5.obj">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\models\carriage.obj">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resources\models\lamp.obj">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4973297A-B162-4923-A75B-AF5540474D4C}</ProjectGuid>

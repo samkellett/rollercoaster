@@ -8,10 +8,12 @@
 #include "freetypefont.h"
 #include "timer.h"
 
-class Camera;
-class Terrain;
 class GameObject;
 class ShaderProgram;
+
+class Camera;
+class Terrain;
+class Rollercoaster;
 
 typedef std::vector<GameObject *> GameObjectList;
 typedef std::vector<char *> ShaderProgramList;
@@ -28,13 +30,18 @@ public:
   ~Game();
 
   Camera *camera();
-  Window &window();
-
   float height(glm::vec3 point);
 
-  int fps();
-  WPARAM exec();
+  glm::vec3 point();
+  glm::vec3 futurePoint(double t);
 
+  void switchTime();
+  bool nighttime();
+
+  int fps();
+  int count();
+  WPARAM exec();
+  Window &window();
   void setHInstance(HINSTANCE hinstance);
   LRESULT processEvents(HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 
@@ -47,6 +54,17 @@ private:
   void registerObjects();
   void loop();
   
+  Camera *camera_;
+  Terrain *terrain_;
+  Rollercoaster *rollercoaster_;
+
+  bool nighttime_;
+
+  GameObjectList objects_;
+  ShaderProgramList programs_;
+  ShaderProgramMap shader_programs_;
+
+  // Boring shit
   Window window_;
   HINSTANCE hinstance_;
 
@@ -55,13 +73,6 @@ private:
   double elapsed_;
   int count_;
   Timer timer_;
-
-  Camera *camera_;
-  Terrain *terrain_;
-
-  GameObjectList objects_;
-  ShaderProgramList programs_;
-  ShaderProgramMap shader_programs_;
 };
 
 #endif

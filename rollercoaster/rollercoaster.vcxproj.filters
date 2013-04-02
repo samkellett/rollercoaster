@@ -10,6 +10,13 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{09e5fe7b-68ca-4376-a403-11ca25938704}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data Files">
+      <UniqueIdentifier>{50c91949-99ea-45b1-9cb5-9a3c394c4543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model Files">
+      <UniqueIdentifier>{44cae761-4064-44ba-aa82-c39f233d224d}</UniqueIdentifier>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h">
@@ -87,6 +94,18 @@
     <ClInclude Include="tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lamp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="support.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -158,6 +177,15 @@
     <ClCompile Include="tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lamp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="support.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\main.frag">
@@ -169,9 +197,6 @@
     <None Include="resources\shaders\terrain.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\terrain.vert">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="resources\shaders\fonts.frag">
       <Filter>Shader Files</Filter>
     </None>
@@ -181,8 +206,102 @@
     <None Include="resources\shaders\trees.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="resources\shaders\trees.vert">
-      <Filter>Shader Files</Filter>
+    <None Include="TODO.txt" />
+    <None Include="resources\models\palm4.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm4.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm5.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm5.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm5.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm4.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm3.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm3.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\palm3.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\data\trees.h">
+      <Filter>Data Files</Filter>
+    </None>
+    <None Include="resources\models\shrub1.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub1.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub2.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub2.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub3.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub3.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub4.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub4.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub5.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub5.tga">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub5.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub4.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub3.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub2.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\shrub1.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\data\track.h">
+      <Filter>Data Files</Filter>
+    </None>
+    <None Include="resources\models\carriage.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\colours.bmp">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\lamp.jpg">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\lamp.mtl">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\carriage.obj">
+      <Filter>Model Files</Filter>
+    </None>
+    <None Include="resources\models\lamp.obj">
+      <Filter>Model Files</Filter>
     </None>
   </ItemGroup>
 </Project>
