@@ -13,8 +13,8 @@
 
 #include <stack>
 #include <vector>
-#include "include\glm\glm.hpp"
-#include "include\glm\gtc\type_ptr.hpp"
+#include "include/glm/glm.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
 
 namespace glutil
 {

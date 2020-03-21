@@ -1,7 +1,7 @@
 #include "shader.h"
 
-#include "include/gl/glew.h"
-#include <gl/gl.h>
+#include "GL/glew.h"
+#include <OpenGL/gl3.h>
 #include "./include/glm/gtc/type_ptr.hpp"
 
 const std::string Shader::DEFAULT_VERTEX_SHADER = "main.vert";
@@ -15,9 +15,9 @@ Shader::Shader(std::string directory, std::string file, int type) :
 
   std::vector<std::string> lines;
   if(!linesFromFile(file, false, &lines)) {
-    char message[1024];
-    sprintf_s(message, "Cannot load shader\n%s\n", file.c_str());
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    // char message[1024];
+    printf("Cannot load shader\n%s\n", file.c_str());
+    // MessageBox(NULL, message, "Error", MB_ICONERROR);
 
     return;
   }
@@ -43,21 +43,22 @@ Shader::Shader(std::string directory, std::string file, int type) :
 
     int log_length;
     glGetShaderInfoLog(id_, 1024, &log_length, log);
-    char shader_type[64];
+    // char shader_type[64];
+    std::string shader_type;
 
     if (type == GL_VERTEX_SHADER) {
-      sprintf_s(shader_type, "vertex shader");
+      shader_type = "vertex shader";
     } else if (type == GL_FRAGMENT_SHADER) {
-      sprintf_s(shader_type, "fragment shader");
+      shader_type = "fragment shader";
     } else if (type == GL_GEOMETRY_SHADER) {
-      sprintf_s(shader_type, "geometry shader");
+      shader_type = "geometry shader";
     } else {
-      sprintf_s(shader_type, "unknown shader type");
+      shader_type = "unknown shader type";
     }
 
-    sprintf_s(message, "Error in %s!\n%s\nShader file not compiled.  The compiler returned:\n\n%s", shader_type, file.c_str(), log);
+    printf("Error in %s!\n%s\nShader file not compiled.  The compiler returned:\n\n%s", shader_type.c_str(), file.c_str(), log);
 
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    // MessageBox(NULL, message, "Error", MB_ICONERROR);
     return;
   }
 
@@ -68,8 +69,9 @@ Shader::Shader(std::string directory, std::string file, int type) :
 // Loads a file into a vector of std::strings (result)
 bool Shader::linesFromFile(std::string filepath, bool include_part, std::vector<std::string>* result)
 {
-  FILE* file;
-  fopen_s(&file, filepath.c_str(), "rt");
+  // FILE* file;
+  // fopen_s(&file, filepath.c_str(), "rt");
+  FILE *file = fopen(filepath.c_str(), "rt");
   if(!file) {
     return false;
   }

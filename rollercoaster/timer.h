@@ -1,7 +1,9 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include <windows.h>
+// #include <windows.h>
+
+#include <chrono>
 
 class Timer 
 {
@@ -13,7 +15,8 @@ public:
   double elapsed();
 
 private:
-  LARGE_INTEGER t1_, t2_;
+  std::chrono::high_resolution_clock::time_point t1_;
+  // LARGE_INTEGER t1_, t2_;
   bool started_;
 };
 

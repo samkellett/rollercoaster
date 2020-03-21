@@ -28,7 +28,7 @@ public:
   glm::mat4 viewMatrix();
 
   void set(glm::vec3 &position, glm::vec3 &viewpoint, glm::vec3 &up_vector);
-  void rotateViewPoint(float theta, glm::vec3 &point);
+  void rotateViewPoint(float theta, glm::vec3 point);
 
   State state();
   void setState(State state);
@@ -42,8 +42,8 @@ public:
   glm::mat3 normal(const glm::mat4 &modelview);
 
   // GameObject methods
-  void mouseHandler(double dt);
-  void keyboardHandler(double dt);
+  void mouseHandler(double dt, GLFWwindow *window);
+  void keyboardHandler(double dt, GLFWwindow *window);
   void update(glutil::MatrixStack &modelview, double dt);
   void render(glutil::MatrixStack &modelview, ShaderProgram *program);
 

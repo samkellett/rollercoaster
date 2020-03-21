@@ -3,8 +3,8 @@
 
 #include "common.h"
 
-#include "include/gl/glew.h"
-#include <gl/gl.h>
+#include "GL/glew.h"
+#include <OpenGL/gl3.h>
 
 enum TextureFiltering
 {
@@ -23,7 +23,7 @@ class Texture
 public:
   Texture();
   
-  void createFromData(BYTE *data, int width, int height, int bpp, GLenum format, bool mipmaps = false);
+  void createFromData(unsigned char *data, int width, int height, int bpp, GLenum format, bool mipmaps = false);
   bool load(std::string path, bool mipmaps = false);
   void bind(int texture = 0);
 

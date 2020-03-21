@@ -1,15 +1,18 @@
 #include "objmodel.h"
 
+#include <iostream>
+
 ObjModel::ObjModel(std::string filename, std::string material) :
   loaded_(false), attributes_(0)
 {
-  FILE* file;
-  fopen_s(&file, filename.c_str(), "rt");
+  // FILE* file;
+  // fopen_s(&file, filename.c_str(), "rt");
+  FILE *file = fopen(filename.c_str(), "rt");
 
   if(file == NULL) {
-    char message[1024];
-    sprintf_s(message, "Cannot load obj model\n%s\n", filename.c_str());
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    // char message[1024];
+    printf("Cannot load obj model\n%s\n", filename.c_str());
+    // MessageBox(NULL, message, "Error", MB_ICONERROR);
 
     return;
   }
@@ -23,6 +26,8 @@ ObjModel::ObjModel(std::string filename, std::string material) :
   faces_ = 0;
 
   while(fgets(line, 255, file)) {
+    // std::cout << "line = " << line << std::endl;
+
     // Error flag, that can be set when something is inconsistent throughout data parsing
     bool error = false;
 
@@ -76,7 +81,7 @@ ObjModel::ObjModel(std::string filename, std::string material) :
         // If there were some vertices defined earlier
         if(attributes_ & 1) {
           if((int) data[0].size() > 0) {
-            sscanf_s(data[0].c_str(), "%d", &vertex_index);
+            sscanf(data[0].c_str(), "%d", &vertex_index);
           } else {
             error = true;
           }
@@ -88,7 +93,7 @@ ObjModel::ObjModel(std::string filename, std::string material) :
             // Just a check whether face format isn't f v//vn
             // In that case, data[1] is empty std::string
             if((int) data[1].size() > 0) {
-              sscanf_s(data[1].c_str(), "%d", &texture_index);
+              sscanf(data[1].c_str(), "%d", &texture_index);
             } else {
               error = true;
             }
@@ -101,7 +106,7 @@ ObjModel::ObjModel(std::string filename, std::string material) :
         if(attributes_ & 4 && !error) {
           if((int) data.size() >= 2) {
             if((int) data[2].size() > 0) {
-              sscanf_s(data[2].c_str(), "%d", &normal_index);
+              sscanf(data[2].c_str(), "%d", &normal_index);
             } else {
               error = true;
             }
@@ -205,7 +210,7 @@ ObjModel::ObjModel(std::string filename, std::string material) :
        t - std::string to split according to
   Result:  Splits std::string according to some substd::string
        and returns it as a vector.
-/*---------------------------------------------*/
+/---------------------------------------------*/
 std::vector<std::string> split(std::string s, std::string t)
 {
   std::vector<std::string> res;
@@ -228,7 +233,7 @@ std::vector<std::string> split(std::string s, std::string t)
   Name:    getDirectoryPath
   Params:  sFilePath - file path
   Result:  Returns path of a directory from file path.
-/*---------------------------------------------*/
+/---------------------------------------------*/
 std::string getDirectoryPath(std::string path)
 {
   // Get directory path
@@ -247,7 +252,7 @@ std::string getDirectoryPath(std::string path)
   Name:    renderModel
   Params:  none
   Result:  Guess what it does :)
-/*---------------------------------------------*/
+/---------------------------------------------*/
 void ObjModel::render()
 {
   if(!loaded_) {
@@ -264,12 +269,13 @@ void ObjModel::render()
   Params:  sFullMtlFileName - full path to material file
   Result:  Loads material (currently only ambient
        texture).
-/*---------------------------------------------*/
+/---------------------------------------------*/
 bool ObjModel::loadMaterial(std::string material)
 {
   // For now, we'll just look for ambient texture, i.e. line that begins with map_Ka
-  FILE* file;
-  fopen_s(&file, material.c_str(), "rt");
+  // FILE* file;
+  // fopen_s(&file, material.c_str(), "rt");
+  FILE *file = fopen(material.c_str(), "rt");
 
   if(file == NULL) {
     return false;
@@ -287,6 +293,8 @@ bool ObjModel::loadMaterial(std::string material)
       int from = line.find("map_Ka") + 6 + 1;
       std::string texture = line.substr(from, (int) line.size() - from - 1);
 
+
+      std::cout << "material " << material << ", texture = " << texture << std::endl;
       // Texture should be in the same directory as material
       texture_.load(getDirectoryPath(material) + texture, true);
       texture_.setFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_NEAREST_MIPMAP);
@@ -304,7 +312,7 @@ bool ObjModel::loadMaterial(std::string material)
   Name:    releaseModel
   Params:  none
   Result:  Frees all used resources by model.
-/*---------------------------------------------*/
+/---------------------------------------------*/
 void ObjModel::release()
 {
   if(!loaded_) {
@@ -321,7 +329,7 @@ void ObjModel::release()
   Name:    getPolygonCount
   Params:  none
   Result:  Returns model polygon count.
-/*---------------------------------------------*/
+/---------------------------------------------*/
 int ObjModel::polygonCount()
 {
   return faces_;

@@ -6,7 +6,7 @@
 
 Terrain::Terrain() :
   dib_(NULL),  
-  heightmap_filename_("resources/textures/heightmap.bmp"),
+  heightmap_filename_("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/textures/heightmap.bmp"),
   
   origin_(0.0f, -10.0f, 0.0f),
   
@@ -21,7 +21,8 @@ Terrain::Terrain() :
 	
 	if (imageBytes(heightmap_filename_, &data, width_, height_) == false) {
     Window &window = Game::instance().window();
-    MessageBox(window.hwnd(), "Couldn't find heightmap!", "Fatal Error", MB_ICONERROR);
+    printf("Couldn't find heightmap!\n");
+    // MessageBox(window.hwnd(), "Couldn't find heightmap!", "Fatal Error", MB_ICONERROR);
 
 		return;
   }
@@ -30,7 +31,8 @@ Terrain::Terrain() :
 	heightmap_ = new float[width_ * height_];
 	if (heightmap_ == NULL) {
     Window &window = Game::instance().window();
-    MessageBox(window.hwnd(), "Heightmap alloc error!", "Fatal Error", MB_ICONERROR);
+    printf("Heightmap alloc error!\n");
+    // MessageBox(window.hwnd(), "Heightmap alloc error!", "Fatal Error", MB_ICONERROR);
 
 		return;
   }
@@ -93,8 +95,8 @@ Terrain::Terrain() :
 	mesh_.createFromTriangleList(vertices, triangles);
 
 	// Load a texture for texture mapping the mesh
-  texture_images_.push_back("resources/textures/sand.jpg");
-  texture_images_.push_back("resources/textures/grass.jpg");
+  texture_images_.push_back("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/textures/sand.jpg");
+  texture_images_.push_back("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/textures/grass.jpg");
 
   for (unsigned int i = 0; i < texture_images_.size(); ++i) {
     Texture texture;
@@ -164,8 +166,8 @@ bool Terrain::imageBytes(char *filename, BYTE **data, unsigned int &width, unsig
 
 	if(!dib_) {
 		char message[1024];
-		sprintf_s(message, "Cannot load image\n%s\n", filename);
-		MessageBox(NULL, message, "Error", MB_ICONERROR);
+		printf("Cannot load image\n%s\n", filename);
+		// MessageBox(NULL, message, "Error", MB_ICONERROR);
 		return false;
 	}
 

@@ -111,6 +111,9 @@ void Game::registerObjects()
 
 void Game::init() 
 {
+  printf("%s\n", glGetString(GL_VERSION));
+  printf("Supported GLSL version is %s.\n", (char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
+
   // Set the clear colour and depth
   glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
   glClearDepth(1.0f);
@@ -128,17 +131,23 @@ void Game::init()
   // Load shaders
   std::vector<Shader> shaders;
   std::vector<std::string> shader_filenames;
+  shader_filenames.push_back("fonts.frag");
+  shader_filenames.push_back("fonts.vert");
+  shader_filenames.push_back("main.frag");
+  shader_filenames.push_back("main.vert");
+  shader_filenames.push_back("terrain.frag");
+  shader_filenames.push_back("trees.frag");
 
-  WIN32_FIND_DATA file;
-  HANDLE find = FindFirstFile("resources/shaders/*", &file);
-  if (find != INVALID_HANDLE_VALUE) {
-    do {
-      if ((file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
-        shader_filenames.push_back(file.cFileName);
-      }
-    } while(FindNextFile(find, &file) != 0);
-    FindClose(find);
-  }
+  // WIN32_FIND_DATA file;
+  // HANDLE find = FindFirstFile("resources/shaders/*", &file);
+  // if (find != INVALID_HANDLE_VALUE) {
+  //   do {
+  //     if ((file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY) {
+  //       shader_filenames.push_back(file.cFileName);
+  //     }
+  //   } while(FindNextFile(find, &file) != 0);
+  //   FindClose(find);
+  // }
  
   for (unsigned int i = 0; i < shader_filenames.size(); ++i) {
     std::string ext = shader_filenames[i].substr((int) shader_filenames[i].size() - 4, 4);
@@ -151,7 +160,7 @@ void Game::init()
       shader_type = GL_GEOMETRY_SHADER;
     }
 
-    Shader shader("resources/shaders/", shader_filenames[i], shader_type);
+    Shader shader("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/shaders/", shader_filenames[i], shader_type);
     shaders.push_back(shader);
   }
 
@@ -180,12 +189,12 @@ void Game::init()
 
     // Fall back to the default shaders if there isn't one that shares a name with the shader program
     if (!vert) {
-      Shader *shader = new Shader("resources/shaders/", Shader::DEFAULT_VERTEX_SHADER, GL_VERTEX_SHADER);
+      Shader *shader = new Shader("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/shaders/", Shader::DEFAULT_VERTEX_SHADER, GL_VERTEX_SHADER);
       shader_programs_[name]->addShader(shader);
     }
 
     if (!frag) {
-      Shader *shader = new Shader("resources/shaders/", Shader::DEFAULT_FRAGMENT_SHADER, GL_FRAGMENT_SHADER);
+      Shader *shader = new Shader("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/shaders/", Shader::DEFAULT_FRAGMENT_SHADER, GL_FRAGMENT_SHADER);
       shader_programs_[name]->addShader(shader);
     }
 
@@ -202,10 +211,10 @@ void Game::init()
   }
 }
 
-void Game::setHInstance(HINSTANCE hinstance) 
-{
-  hinstance_ = hinstance;
-}
+// void Game::setHInstance(HINSTANCE hinstance) 
+// {
+//   hinstance_ = hinstance;
+// }
 
 Camera *Game::camera()
 {
@@ -256,7 +265,7 @@ int Game::count()
   return count_;
 }
 
-void Game::loop() 
+void Game::loop(GLFWwindow *window) 
 {  
   // Clear the buffers and enable depth testing (z-buffering)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -287,8 +296,8 @@ void Game::loop()
     modelview.push();
       GameObject *object = objects_[i];
 
-      object->mouseHandler(dt_);
-      object->keyboardHandler(dt_);
+      object->mouseHandler(dt_, window);
+      object->keyboardHandler(dt_, window);
       object->update(modelview, dt_);
 
       ShaderProgram *program = shader_programs_[object->program()];
@@ -303,121 +312,152 @@ void Game::loop()
   if(elapsed_ > 1000 ) {
     elapsed_ = 0;
     fps_ = count_;
+    printf("fps = %d\n", fps_);
 
     count_ = 0;
   }
 
   // Swap buffers to show the rendered image
-  SwapBuffers(window_.hdc());    
+  // SwapBuffers(window_.hdc());    
 }
 
-WPARAM Game::exec() 
-{
-  window_.init(hinstance_);
+void processEvents(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-  if(!window_.hdc()) {
-    return 1;
-  }
+void Game::exec(GLFWwindow *window) 
+{
+  // window_.init(hinstance_);
+
+  // if(!window_.hdc()) {
+  //   return 1;
+  // }
 
   init();
+  glfwSetKeyCallback(window, processEvents);
 
   timer_.start();
   double frame_duration = 1000.0 / (double) Game::FPS;
 
-  MSG msg;
-  while(true) {                          
-    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { 
-      if(msg.message == WM_QUIT) {
-        break;
-      }
+  while (!glfwWindowShouldClose(window))
+  {
+    timer_.start();
+    loop(window);
+    dt_ = timer_.elapsed();
 
-      TranslateMessage(&msg);  
-      DispatchMessage(&msg);
-    } else {
-      timer_.start();
-      loop();
-      dt_ = timer_.elapsed();
-    }
+    glfwSwapBuffers(window);
+    glfwPollEvents();
   }
 
-  window_.deinit();
+  // MSG msg;
+  // while(true) {                          
+  //   if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { 
+  //     if(msg.message == WM_QUIT) {
+  //       break;
+  //     }
 
-  return msg.wParam;
+  //     TranslateMessage(&msg);  
+  //     DispatchMessage(&msg);
+  //   } else {
+  //     timer_.start();
+  //     loop();
+  //     dt_ = timer_.elapsed();
+  //   }
+  // }
+
+  // window_.deinit();
+
+  // return msg.wParam;
 }
 
-LRESULT Game::processEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_param) 
-{
-  LRESULT result = 0;
-
-  switch (message) {
-    case WM_ACTIVATE:
-      switch(LOWORD(w_param)) {
-        case WA_ACTIVE:
-        case WA_CLICKACTIVE:
-          timer_.start();
-        break;
-      }
-    break;
-
-    case WM_SIZE:
-      RECT dimensions;
-      GetClientRect(window, &dimensions);
-      window_.setDimensions(dimensions);
-    break;
-
-    case WM_PAINT:
-      PAINTSTRUCT ps;
-      BeginPaint(window, &ps);
-      EndPaint(window, &ps);
-    break;
-
-    case WM_KEYDOWN:
-      switch(w_param) {
-        case 32: // space
-          char pos[128];
-          sprintf_s(pos, "  { %.2ff, %.2ff, %.2ff },\n", camera_->position().x, camera_->position().y, camera_->position().z);
-          OutputDebugString(pos);
-
-          rollercoaster_->addDerivative(camera_->position());
-        break;
-
-        case 49: // 1
-          camera_->setState(Camera::FREE);
-        break;
-
-        case 50: // 2
-          camera_->setState(Camera::FPS);
-        break;
-
-        case 51: // 3
-          camera_->setState(Camera::SIDE);
-        break;
-
-        case 52: // 4
-          camera_->setState(Camera::BIRD);
-        break;
-
-        case 53: // 5
-          switchTime();
-        break;
-
-        case VK_ESCAPE:
-          PostQuitMessage(0);
-        break;
-      }
-    break;
-
-    case WM_DESTROY:
-      PostQuitMessage(0);
-    break;
-
-    default:
-      result = DefWindowProc(window, message, w_param, l_param);
-    break;
+void processEvents(GLFWwindow *window, int key, int scancode, int action, int mods) {
+  Game &game = Game::instance();
+  if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
+    game.rollercoaster().addDerivative(game.camera()->position());
+  } else if (key == GLFW_KEY_1 && action == GLFW_RELEASE) {
+    game.camera()->setState(Camera::FREE);
+  } else if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
+    game.camera()->setState(Camera::FPS);
+  } else if (key == GLFW_KEY_3 && action == GLFW_RELEASE) {
+    game.camera()->setState(Camera::SIDE);
+  } else if (key == GLFW_KEY_4 && action == GLFW_RELEASE) {
+    game.camera()->setState(Camera::BIRD);
+  } else if (key == GLFW_KEY_5 && action == GLFW_RELEASE) {
+    game.switchTime();
   }
-
-  return result;
 }
+
+// LRESULT Game::processEvents(HWND window,UINT message, WPARAM w_param, LPARAM l_param) 
+// {
+//   LRESULT result = 0;
+
+//   switch (message) {
+//     case WM_ACTIVATE:
+//       switch(LOWORD(w_param)) {
+//         case WA_ACTIVE:
+//         case WA_CLICKACTIVE:
+//           timer_.start();
+//         break;
+//       }
+//     break;
+
+//     case WM_SIZE:
+//       RECT dimensions;
+//       GetClientRect(window, &dimensions);
+//       window_.setDimensions(dimensions);
+//     break;
+
+//     case WM_PAINT:
+//       PAINTSTRUCT ps;
+//       BeginPaint(window, &ps);
+//       EndPaint(window, &ps);
+//     break;
+
+//     case WM_KEYDOWN:
+//       switch(w_param) {
+//         case 32: // space
+//           char pos[128];
+//           sprintf_s(pos, "  { %.2ff, %.2ff, %.2ff },\n", camera_->position().x, camera_->position().y, camera_->position().z);
+//           OutputDebugString(pos);
+
+//           rollercoaster_->addDerivative(camera_->position());
+//         break;
+
+//         case 49: // 1
+//           camera_->setState(Camera::FREE);
+//         break;
+
+//         case 50: // 2
+//           camera_->setState(Camera::FPS);
+//         break;
+
+//         case 51: // 3
+//           camera_->setState(Camera::SIDE);
+//         break;
+
+//         case 52: // 4
+//           camera_->setState(Camera::BIRD);
+//         break;
+
+//         case 53: // 5
+//           switchTime();
+//         break;
+
+//         case VK_ESCAPE:
+//           PostQuitMessage(0);
+//         break;
+//       }
+//     break;
+
+//     case WM_DESTROY:
+//       PostQuitMessage(0);
+//     break;
+
+//     default:
+//       result = DefWindowProc(window, message, w_param, l_param);
+//     break;
+//   }
+
+//   return result;
+// }
 
 Game& Game::instance() 
 {

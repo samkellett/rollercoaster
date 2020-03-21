@@ -3,6 +3,9 @@
 
 #include "gameobject.h"
 
+#include "vbo.h"
+#include "texture.h"
+
 class Pyramid : public GameObject
 {
 public:

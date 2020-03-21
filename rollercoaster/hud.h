@@ -2,6 +2,7 @@
 #define HUD_H
 
 #include "gameobject.h"
+#include "freetypefont.h"
 
 class HUD : public GameObject
 {

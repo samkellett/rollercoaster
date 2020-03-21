@@ -3,6 +3,8 @@
 #include "camera.h"
 #include "window.h"
 
+#include <sstream>
+
 HUD::HUD()
 {
   font_.loadSystemFont("arial.ttf", 32);
@@ -26,7 +28,12 @@ void HUD::render(glutil::MatrixStack &modelview, ShaderProgram *program)
     program->setUniform("colour", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     font_.setShaderProgram(program);
-    font_.printf(20, height - 20, 20, "FPS: %d", fps);
+
+    std::stringstream ss;
+    ss << "FPS: " << fps;
+    std::string msg = ss.str();
+    font_.print(msg, height - 20, 20, msg.size());
+    // font_.printf(20, height - 20, 20, "FPS: %d", fps);
 
     glEnable(GL_DEPTH_TEST);
   }

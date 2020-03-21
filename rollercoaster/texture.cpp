@@ -2,7 +2,9 @@
 
 #include "common.h"
 
-#include "include\freeimage\FreeImage.h"
+#include "include/freeimage/FreeImage.h"
+
+#include <iostream>
 
 Texture::Texture() :
   mipmaps_(false)
@@ -10,7 +12,7 @@ Texture::Texture() :
 }
 
 // Create a texture from the data stored in bData.  
-void Texture::createFromData(BYTE *data, int width, int height, int bpp, GLenum format, bool mipmaps)
+void Texture::createFromData(unsigned char *data, int width, int height, int bpp, GLenum format, bool mipmaps)
 {
   path_ = "";
   mipmaps_ = mipmaps;
@@ -37,6 +39,8 @@ void Texture::createFromData(BYTE *data, int width, int height, int bpp, GLenum 
 // Loads a 2D texture given the filename (sPath).  bGenerateMipMaps will generate a mipmapped texture if true
 bool Texture::load(std::string path, bool mipmaps)
 {
+  // std::cout << "texture.load = " << path << std::endl;
+
   FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
   FIBITMAP* dib(0);
 
@@ -59,8 +63,8 @@ bool Texture::load(std::string path, bool mipmaps)
 
   if(!dib) {
     char message[1024];
-    sprintf_s(message, "Cannot load image\n%s\n", path.c_str());
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    printf("Cannot load image\n%s\n", path.c_str());
+    // MessageBox(NULL, message, "Error", MB_ICONERROR);
 
     return false;
   }

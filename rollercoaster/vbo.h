@@ -4,7 +4,7 @@
 #include "common.h"
 
 #include "include/gl/glew.h"
-#include <gl/gl.h>
+#include <OpenGL/gl3.h>
 
 // This class provides a wrapper around an OpenGL Vertex Buffer Object
 class VBO
@@ -38,7 +38,7 @@ private:
   UINT buffer_;
   int size_;
   int type_;
-  std::vector<BYTE> data_;
+  std::vector<unsigned char> data_;
 
   bool uploaded_;
 };

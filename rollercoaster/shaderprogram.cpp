@@ -3,7 +3,7 @@
 #include "shader.h"
 
 #include "include/gl/glew.h"
-#include <gl/gl.h>
+#include <OpenGL/gl3.h>
 #include "./include/glm/gtc/type_ptr.hpp"
 
 ShaderProgram::ShaderProgram()
@@ -35,14 +35,14 @@ bool ShaderProgram::link()
   int status;
   glGetProgramiv(id_, GL_LINK_STATUS, &status);
 
-  if (status == FALSE) {
+  if (status == GL_FALSE) {
     char log[1024];
-    char message[1536];
+    // char message[1536];
     int log_length;
 
     glGetProgramInfoLog(id_, 1024, &log_length, log);
-    sprintf_s(message, "Error! Shader program %s wasn't linked! The linker returned:\n\n%s", log);
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    printf("Error! Shader program %s wasn't linked! The linker returned:\n\n%s", log);
+    // MessageBox(NULL, message, "Error", MB_ICONERROR);
 
     return false;
   }

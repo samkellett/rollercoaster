@@ -2,14 +2,17 @@
 #define GAME_H
 
 #include "common.h"
-#include <hash_map>
+#include <unordered_map>
 
 #include "window.h"
-#include "freetypefont.h"
+// #include "freetypefont.h"
 #include "timer.h"
+
+#include <GLFW/glfw3.h>
 
 class GameObject;
 class ShaderProgram;
+class Window;
 
 class Camera;
 class Terrain;
@@ -17,7 +20,7 @@ class Rollercoaster;
 
 typedef std::vector<GameObject *> GameObjectList;
 typedef std::vector<char *> ShaderProgramList;
-typedef std::hash_map<std::string, ShaderProgram *> ShaderProgramMap;
+typedef std::unordered_map<std::string, ShaderProgram *> ShaderProgramMap;
 
 class Game
 {
@@ -38,21 +41,23 @@ public:
   void switchTime();
   bool nighttime();
 
+  Rollercoaster &rollercoaster() { return *rollercoaster_; }
+
   int fps();
   int count();
-  WPARAM exec();
+  void exec(GLFWwindow*);
   Window &window();
-  void setHInstance(HINSTANCE hinstance);
-  LRESULT processEvents(HWND window, UINT message, WPARAM w_param, LPARAM l_param);
+  // void setHInstance(HINSTANCE hinstance);
+  // LRESULT processEvents(HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 
 private:
-  Game::Game();
-  Game::Game(const Game&);
-  void Game::operator=(const Game&);
+  Game();
+  Game(const Game&);
+  void operator=(const Game&);
 
   void init();
   void registerObjects();
-  void loop();
+  void loop(GLFWwindow *window);
   
   Camera *camera_;
   Terrain *terrain_;
@@ -66,7 +71,7 @@ private:
 
   // Boring shit
   Window window_;
-  HINSTANCE hinstance_;
+  // HINSTANCE hinstance_;
 
   double dt_;
   int fps_;

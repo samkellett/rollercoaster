@@ -75,7 +75,7 @@ void VBO::uploadDataToGPU(int drawing)
 // Adds data to the VBO.  
 void VBO::addData(void *data, UINT size)
 {
-  data_.insert(data_.end(), (BYTE *) data, (BYTE *) data + size);
+  data_.insert(data_.end(), (unsigned char *) data, (unsigned char *) data + size);
 }
 
 // Gets a pointer to the data.  Note this is only valid before uploading, since the data is cleared on upload.

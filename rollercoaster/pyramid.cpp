@@ -4,7 +4,7 @@
 Pyramid::Pyramid(glm::vec2 position, float scale) : GameObject(),
   position_(position.x, 0.0f, position.y), scale_(scale),
 
-  directory_("resources/textures/"),
+  directory_("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/textures/"),
   filename_("pyramid.jpg"),
   width_(10.0f),
   height_(7.5f)

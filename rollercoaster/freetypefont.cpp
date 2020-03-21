@@ -6,6 +6,8 @@
 #include "shader.h"
 #include "shaderprogram.h"
 
+#include <iostream>
+
 FreeTypeFont::FreeTypeFont() :
   loaded_(false)
 {
@@ -91,14 +93,14 @@ void FreeTypeFont::createChar(int index)
 // Loads an entire font with the given path sFile and pixel size iPXSize
 bool FreeTypeFont::loadFont(std::string file, int size)
 {
-  BOOL error = FT_Init_FreeType(&freetype_);
+  int error = FT_Init_FreeType(&freetype_);
   
   error = FT_New_Face(freetype_, file.c_str(), 0, &freetype_face_);
   if(error) {
-    char message[1024];
-    sprintf_s(message, "Cannot load font\n%s\n", file.c_str());
+    // char message[1024];
+    printf("Cannot load font\n%s\n", file.c_str());
 
-    MessageBox(NULL, message, "Error", MB_ICONERROR);
+    // MessageBox(NULL, message, "Error", MB_ICONERROR);
     return false;
   }
 
@@ -133,14 +135,16 @@ bool FreeTypeFont::loadFont(std::string file, int size)
 // Loads a system font with given name (sName) and pixel size (iPXSize)
 bool FreeTypeFont::loadSystemFont(std::string name, int size)
 {
-  char windows_directory[512]; 
-  GetWindowsDirectory(windows_directory, 512);
+  std::cout << "TODO: loadSystemFont " << name << std::endl;
+  return true;
+  // char windows_directory[512]; 
+  // GetWindowsDirectory(windows_directory, 512);
   
-  std::string path = windows_directory;
-  path += "\\Fonts\\";
-  path += name;
+  // std::string path = windows_directory;
+  // path += "\\Fonts\\";
+  // path += name;
 
-  return loadFont(path, size);
+  // return loadFont(path, size);
 }
 
 
@@ -192,20 +196,19 @@ void FreeTypeFont::print(std::string text, int x, int y, int size)
   glDisable(GL_BLEND);
 }
 
+// // Print formatted text at the location (x, y) with specified pixel size (iPXSize)
+// void FreeTypeFont::printf(int x, int y, int size, char* text, ...)
+// {
+//   char buf[512];
 
-// Print formatted text at the location (x, y) with specified pixel size (iPXSize)
-void FreeTypeFont::printf(int x, int y, int size, char* text, ...)
-{
-  char buf[512];
+//   // Sam: this is cool.
+//   va_list ap;
+//   va_start(ap, text);
+//   vsprintf_s(buf, text, ap);
+//   va_end(ap);
 
-  // Sam: this is cool.
-  va_list ap;
-  va_start(ap, text);
-  vsprintf_s(buf, text, ap);
-  va_end(ap);
-
-  print(buf, x, y, size);
-}
+//   print(buf, x, y, size);
+// }
 
 // Deletes all font textures
 void FreeTypeFont::release()

@@ -1,7 +1,7 @@
 #include "camera.h"
 
-#include "include/gl/glew.h"
-#include <gl/gl.h>
+#include "GL/glew.h"
+#include <OpenGL/gl3.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -57,10 +57,11 @@ void Camera::setState(State state)
 }
 
 // Respond to mouse movement
-void Camera::mouseHandler(double)
+void Camera::mouseHandler(double, GLFWwindow *window)
 {
   if (state_ == FREE || state_ == FPS) {
-    ShowCursor(false);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // ShowCursor(false);
 
     int middle_x = Window::WIDTH / 2;
     int middle_y = Window::HEIGHT / 2;
@@ -69,17 +70,22 @@ void Camera::mouseHandler(double)
     float angle_z = 0.0f;
     static float rotation_x = 0.0f;
 
+    struct POINT {
+      double x, y;
+    };
     POINT mouse;
-    GetCursorPos(&mouse);
+    glfwGetCursorPos(window, &mouse.x, &mouse.y);
+    // GetCursorPos(&mouse);
 
-    if (mouse.x == middle_x && mouse.y == middle_y) {
+    if (int(mouse.x) == middle_x && int(mouse.y) == middle_y) {
       return;
     }
 
-    SetCursorPos(middle_x, middle_y);
+    glfwSetCursorPos(window, middle_x, middle_y);
+    // SetCursorPos(middle_x, middle_y);
 
-    angle_y = (float) (middle_x - mouse.x) / 1000.0f;
-    angle_z = (float) (middle_y - mouse.y) / 1000.0f;
+    angle_y = (float) (middle_x - mouse.x) / 500.0f;
+    angle_z = (float) (middle_y - mouse.y) / 500.0f;
 
     rotation_x -= angle_z;
 
@@ -100,7 +106,7 @@ void Camera::mouseHandler(double)
 }
 
 // Rotate the camera view point -- this effectively rotates the camera since it is looking at the view point
-void Camera::rotateViewPoint(float angle, glm::vec3 &point)
+void Camera::rotateViewPoint(float angle, glm::vec3 point)
 {
   glm::vec3 view = view_ - position_;
   
@@ -160,23 +166,28 @@ void Camera::render(glutil::MatrixStack &, ShaderProgram *)
 {
 }
 
-void Camera::keyboardHandler(double dt)
+void Camera::keyboardHandler(double dt, GLFWwindow *window)
 {
   if (state_ == FREE) {
-    if(GetKeyState(87) & 0x80) {
-      advance(1.0 * dt);
+    // printf("dt = %f, getkey(w) = %d, (press = %d, release = %d)\n", dt, glfwGetKey(window, GLFW_KEY_W), GLFW_PRESS, GLFW_RELEASE);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    // if(GetKeyState(87) & 0x80) {
+      advance(3.0 * dt);
     }
 
-    if(GetKeyState(83) & 0x80) {
-      advance(-1.0 * dt);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    // if(GetKeyState(83) & 0x80) {
+      advance(-3.0 * dt);
     }
 
-    if(GetKeyState(65) & 0x80) {
-      strafe(-1.0 * dt);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    // if(GetKeyState(65) & 0x80) {
+      strafe(-3.0 * dt);
     }
 
-    if(GetKeyState(68) & 0x80 ) {
-      strafe(1.0 * dt);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    // if(GetKeyState(68) & 0x80 ) {
+      strafe(3.0 * dt);
     }
   }
 }

@@ -3,7 +3,7 @@
 #include "point.h"
 #include "vbo.h"
 
-glm::vec3 CatmullRom::interpolate(glm::vec3 &p0, glm::vec3 &p1, glm::vec3 &p2, glm::vec3 &p3, float t)
+glm::vec3 CatmullRom::interpolate(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, float t)
 {
 	float t2 = t * t;
   float t3 = t2 * t;

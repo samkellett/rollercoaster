@@ -9,7 +9,7 @@
 // Create the skybox
 // Skybox downloaded from http://www.alusion-fr.com/an1ffa1.htm
 Skybox::Skybox() : GameObject(),
-  directory_("resources/skyboxes/faesky02/"),
+  directory_("/Users/samkellett/devel/rollercoaster/rollercoaster/resources/skyboxes/faesky02/"),
   front_("faesky02right.jpg"),
   back_("faesky02left.jpg"),
   left_("faesky02front.jpg"),

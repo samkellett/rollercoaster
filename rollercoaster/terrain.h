@@ -3,7 +3,7 @@
 
 #include "gameobject.h"
 #include "facevertexmesh.h"
-#include "include\freeimage\FreeImage.h"
+#include "include/freeimage/FreeImage.h"
 
 #include "sphere.h"
 

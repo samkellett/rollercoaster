@@ -1,4 +1,4 @@
-#version 330
+#version 410
 
 // Structure for matrices
 uniform struct Matrices {
@@ -90,11 +90,11 @@ void main()
 
 	vec3 night_colour = vec3(0.0);
 	if (nighttime) {
-		night_colour += pointLight(eye_position, eye_normal, light0);
-		night_colour += pointLight(eye_position, eye_normal, light1);
-		night_colour += pointLight(eye_position, eye_normal, light2);
-		night_colour += pointLight(eye_position, eye_normal, light3);
-		night_colour += pointLight(eye_position, eye_normal, light4);
+		night_colour += pointLight(eye_position.xyz, eye_normal, light0);
+		night_colour += pointLight(eye_position.xyz, eye_normal, light1);
+		night_colour += pointLight(eye_position.xyz, eye_normal, light2);
+		night_colour += pointLight(eye_position.xyz, eye_normal, light3);
+		night_colour += pointLight(eye_position.xyz, eye_normal, light4);
 	}
 
 	colour = night_colour + phongModel(eye_position, eye_normal, sun);

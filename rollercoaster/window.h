@@ -1,12 +1,19 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <windows.h>
+// #include <windows.h>
 
 #include "common.h"
 
-LRESULT CALLBACK WinProc(HWND hWnd,UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK fakeWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+// LRESULT CALLBACK WinProc(HWND hWnd,UINT uMsg, WPARAM wParam, LPARAM lParam);
+// LRESULT CALLBACK fakeWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+struct RECT {
+  int left = 0;
+  int top = 0;
+  int right = 960;
+  int bottom = 540;
+};
 
 class Window {
 public:
@@ -17,32 +24,32 @@ public:
 
   Window();
 
-  HDC init(HINSTANCE hinstance);
-  void deinit();
+  // HDC init(HINSTANCE hinstance);
+  // void deinit();
 
   void setDimensions(RECT dimensions);
   RECT dimensions();
 
-  HDC hdc() const;
-  HINSTANCE hinstance() const;
-  HGLRC hrc() const;
-  HWND hwnd() const;
+  // HDC hdc() const;
+  // HINSTANCE hinstance() const;
+  // HGLRC hrc() const;
+  // HWND hwnd() const;
 
 private:
   Window(const Window&);
   void operator=(const Window&);
 
-  void create(std::string title);
-  void initOpenGL();
-  bool initGLEW();
-  void registerOpenGLClass(HINSTANCE hInstance);
+  // void create(std::string title);
+  // void initOpenGL();
+  // bool initGLEW();
+  // void registerOpenGLClass(HINSTANCE hInstance);
 
-  HDC hdc_;
-  HINSTANCE hinstance_;
-  HGLRC hrc_;
-  HWND hwnd_;
+  // HDC hdc_;
+  // HINSTANCE hinstance_;
+  // HGLRC hrc_;
+  // HWND hwnd_;
 
-  LPSTR class_;
+  // LPSTR class_;
   RECT dimensions_;
 
   std::string name_;

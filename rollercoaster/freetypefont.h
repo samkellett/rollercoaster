@@ -21,7 +21,7 @@ public:
   int textWidth(std::string text, int size);
 
   void print(std::string sText, int x, int y, int size = -1);
-  void printf(int x, int y, int size, char* text, ...);
+  // void printf(int x, int y, int size, char* text, ...);
 
   void release();
 

@@ -2,7 +2,7 @@
 #define COMMON_H
 
 #include <ctime>
-#include <windows.h>
+// #include <windows.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -16,7 +16,7 @@
 #include "include/glm/gtc/matrix_transform.hpp"
 
 #include "include/gl/glew.h"
-#include <gl/gl.h>
-#include <gl/glu.h>
+#include <OpenGL/gl3.h>
+#include <OpenGL/glu.h>
 
 #endif
